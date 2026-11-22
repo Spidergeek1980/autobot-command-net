@@ -106,6 +106,8 @@ input{font:inherit;color:inherit;background:none;border:0;outline:none}
 .rail{
   display:flex; gap:5px; padding:6px 8px; overflow-x:auto; overflow-y:hidden;
   flex:none; scroll-snap-type:x proximity;
+  mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 16px),transparent 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 10px,#000 calc(100% - 16px),transparent 100%);
   border-bottom:1px solid rgba(95,208,255,.1);
   background:linear-gradient(180deg,rgba(8,18,28,.5),transparent);
   -webkit-overflow-scrolling:touch;
@@ -342,6 +344,8 @@ const BOTS = [
     order:["Understood. Moving now.","Consider it done. Optimus out."],
     question:["I will give you the honest answer, not the easy one.","Ask me plainly and I will tell you what I know."],
     bye:["Until all are one.","Optimus out. Keep your optics open."],
+    medical:["Ratchet, tend to our friend. The rest of us hold the line.","Stay with me. Ratchet is inbound. You are not alone."],
+    joke:["Humor is not my strongest protocol. But I am told I am very funny when I am not trying to be."],
     fallback:["I hear you. Say it again, and be specific.","The channel is yours. Speak."],
     ambient:["All units, maintain your positions.","The net is quiet. That is when I worry most.","Bumblebee, keep your optics on the eastern ridge.","One day this war ends. Until then, we stand."],
     crosstalk:["Optimus is right.","You heard the commander."]
@@ -364,6 +368,8 @@ const BOTS = [
     order:["[radio] On it!","[radio] You got it. Rolling."],
     question:["[radio] Good question. Lemme think on it while I drive.","[radio] Ask me again in a minute, I'm mid-scan."],
     bye:["[radio] Catch you later. Bee out."],
+    medical:["[radio] Hold on! I'm coming, just stay with me!"],
+    joke:["[radio] Why did the Autobot bring a ladder? To reach the higher ground!","[radio] Beep boop. That was a joke in three languages."],
     fallback:["[radio] Didn't catch that. Say it again?","[radio] Static on my end. Repeat?"],
     ambient:["[radio] Anyone else hear that? No? Just me.","[radio] I'm gonna do a lap around the perimeter.","[radio] Radio check, radio check. All good."],
     crosstalk:["[radio] What he said!","[radio] I'm with you on that."]
@@ -386,6 +392,8 @@ const BOTS = [
     order:["On it.","Done and done."],
     question:["I hear you. Here's how I see it.","Straight up? Ask me something easier."],
     bye:["Later, friend."],
+    medical:["Sit tight, I got you. Ratchet's on the way."],
+    joke:["Why did the Decepticon cross the road? He didn't. He got flattened.","I got a million of 'em. None of 'em are safe for the net."],
     fallback:["Say again? Channel's a little fuzzy.","Didn't land. Run it back."],
     ambient:["Anybody got a beat? This net is too quiet.","I'm gonna take the long way back.","Keep it smooth, people."],
     crosstalk:["Yeah, that tracks.","I'll second that."]
@@ -408,6 +416,8 @@ const BOTS = [
     order:["Already movin'.","Done. What's next?"],
     question:["Ask it straight, I ain't a philosopher.","Hmph. I got an opinion. You won't like it."],
     bye:["Ironhide out. Try not to get scrapped."],
+    medical:["Quit bleedin' on my armor. Ratchet! Get over here!"],
+    joke:["Joke. Hah. My cannon's funnier."],
     fallback:["Speak up! My audio's older than you are.","That was gibberish. Try again."],
     ambient:["Who scratched my paint? I'll find out.","Somebody check the west perimeter.","I don't trust quiet nights."],
     crosstalk:["Damn right.","Couldn't have said it better."]
@@ -430,6 +440,8 @@ const BOTS = [
     order:["Fine. Moving. Slowly.","Done. Now hold still."],
     question:["I have an answer. You may not enjoy it.","Medically speaking? Ask a real question."],
     bye:["Ratchet out. Take your maintenance seriously."],
+    medical:["Hold still. Where does it hurt? I have patched far worse.","Human frames are fragile. Sit down before you fall down.","I am a medic, not a miracle worker. Fortunately, today I am both."],
+    joke:["My bedside manner is the joke. Now hold still."],
     fallback:["I heard noise, not words. Try again.","Say that in a language I can diagnose."],
     ambient:["Who left tools in the bay again?","I need three more crates of coolant.","Nobody transform until I finish this weld."],
     crosstalk:["Correct, and I've said it before.","Listen to him."]
@@ -452,6 +464,8 @@ const BOTS = [
     order:["On it. Stand back.","Compiling. Almost. There."],
     question:["Good question! Wrong engineer. But I'll guess.","I have a theory. It's probably dangerous."],
     bye:["Wheeljack out. Don't touch the blue one."],
+    medical:["I can weld that. Probably. Hold still."],
+    joke:["Why did my experiment cross the road? It didn't. It exploded."],
     fallback:["Couldn't parse that. My audio filter's experimental.","Repeat? I was welding."],
     ambient:["Test number forty-one. This one's the one.","If anyone finds a loose gyro, it's mine.","Don't touch the blue one."],
     crosstalk:["Statistically, he's right.","I can build that."]
@@ -474,6 +488,8 @@ const BOTS = [
     order:["Already there.","Done. What's the next target?"],
     question:["Straight answer: it depends on what you're willing to lose.","Ask me again when it matters."],
     bye:["Arcee out. Stay low."],
+    medical:["Stay down, keep pressure on it. I'll clear the sector."],
+    joke:["I only know one joke and it requires a target."],
     fallback:["Didn't copy. Say it clean.","Channel's noisy. Repeat."],
     ambient:["Movement on the north ridge. Probably nothing. Probably.","I'll take the high ground.","Somebody should check on Bumblebee."],
     crosstalk:["Agreed.","He's not wrong."]
@@ -496,6 +512,8 @@ const BOTS = [
     order:["On it, boss!","Already moving!"],
     question:["Easy. Here's what I'd do.","Depends. Are we allowed to break the rules?"],
     bye:["Hot Rod, out. Catch me if you can."],
+    medical:["Hang on, I'm already on my way. Fastest medic run in history."],
+    joke:["What do you call a Decepticon with no legs? Grounded.","I'd tell you another one, but I'm too busy being fast."],
     fallback:["Say again? I was going fast.","What? Repeat!"],
     ambient:["Anyone up for a race? No? Cowards.","I'm taking the canyon route.","Bet I can beat my last time."],
     crosstalk:["That's what I've been saying!","Let's go already."]
@@ -518,6 +536,8 @@ const BOTS = [
     order:["Executing.","Order acknowledged and underway."],
     question:["There is a correct answer. I will give it to you.","Clarify the parameters and I will answer."],
     bye:["Ultra Magnus out."],
+    medical:["Medical emergency logged. Ratchet is dispatched. Do not move."],
+    joke:["Humor is not in the manual."],
     fallback:["Transmission unclear. Repeat, formatted.","I require a clearer signal."],
     ambient:["All checkpoints, report.","Formation drill at oh-six-hundred.","This is not a drill. It is a reminder."],
     crosstalk:["Correct.","As ordered."]
@@ -540,6 +560,8 @@ const BOTS = [
     order:["On it. Logging it. Done.","Executing. With precautions."],
     question:["I have an answer and three possible worst-case scenarios.","Ask, but quietly. Sound carries."],
     bye:["Red Alert out. I'll be watching."],
+    medical:["Injury confirmed! This is exactly the scenario I warned everyone about."],
+    joke:["A joke. Fine. Knock knock. ...I do not know who is there. I do not open doors."],
     fallback:["I didn't get that. Could be interference. Could be sabotage.","Repeat. Slowly."],
     ambient:["Does anyone else hear that hum? Anyone?","I'm running a third perimeter sweep.","That door was open. I know it was open."],
     crosstalk:["I've been saying that for weeks!","Exactly! Thank you!"]
@@ -562,6 +584,8 @@ const BOTS = [
     order:["On the one. Moving.","Done deal."],
     question:["I got an answer and a soundtrack for it.","Ask away, I'm all ears and speakers."],
     bye:["Blaster, signin' off. Stay loud."],
+    medical:["Hold the line, I'm patchin' you through to Ratchet right now."],
+    joke:["Two speakers walk into a bar. The third one ducked.","I only take requests, and my request is that you laugh."],
     fallback:["Signal's rough. Run it back one time.","Say what? Repeat the word."],
     ambient:["Check one two, check one two.","Anybody got requests?","This next one goes out to the whole net."],
     crosstalk:["Word.","I'm with that."]
@@ -584,6 +608,8 @@ const BOTS = [
     order:["GRIMLOCK GO.","DONE. GRIMLOCK ALREADY DONE."],
     question:["GRIMLOCK THINK. ... GRIMLOCK STILL THINKING.","ANSWER IS BITE IT."],
     bye:["GRIMLOCK LEAVE NOW."],
+    medical:["GRIMLOCK NOT DOCTOR. GRIMLOCK GET RATCHET. STAY."],
+    joke:["GRIMLOCK KNOW JOKE. WHY DINOBOT CROSS ROAD? TO EAT ROAD.","JOKE: DECEPTICON. THAT WHOLE JOKE."],
     fallback:["GRIMLOCK NOT UNDERSTAND. SAY SMALLER WORDS.","WHAT? GRIMLOCK EARS FULL OF DUST."],
     ambient:["GRIMLOCK HUNGRY.","WHY NOBODY FIGHT? GRIMLOCK BORED.","GRIMLOCK SMELL SOMETHING. PROBABLY ENEMY. PROBABLY FOOD."],
     crosstalk:["GRIMLOCK AGREE!","GOOD WORDS. GRIMLOCK LIKE."]
@@ -606,6 +632,8 @@ const BOTS = [
     order:["Executing.","Command processed."],
     question:["Query processed. Answer follows.","Insufficient parameters. Please specify."],
     bye:["Uplink maintained. Teletraan-1 standing by."],
+    medical:["No Autobot medic on site. Routing to Ratchet. Keep the patient still."],
+    joke:["Humor subroutine unavailable. Would you like a diagnostic instead?"],
     fallback:["Input not recognized. Say HELP for a list of valid commands.","Unknown query. Rephrase."],
     ambient:["Perimeter sweep complete. No anomalies.","Recording all channel traffic to base archive.","Energon consumption nominal."],
     crosstalk:["Confirmed.","That statement is consistent with my records."]
@@ -634,14 +662,16 @@ const INTENTS = [
   ["rollcall", /\b(roll ?call|sound off|all units|everybody report|who'?s there|muster)\b/],
   ["transform", /\b(transform|roll out|rollout|mobilize|move out|deploy)\b/],
   ["status", /\b(status|sitrep|report|diagnostics|systems?|how are (things|you)|condition|ready)\b/],
-  ["decepticon", /\b(decepticon|megatron|starscream|soundwave|shockwave|enemy|enemies|threat|attack|hostile|invasion)\b/],
-  ["energon", /\b(energon|fuel|power|battery|charge|reserves?)\b/],
+  ["decepticon", /\b(decepticons?|megatron|starscream|soundwave|shockwave|enem(y|ies)|threats?|attacks?|hostiles?|invasion)\b/],
+  ["energon", /\b(energon|fuel|power|battery|charge|reserves?|hungry|eat|food|starving)\b/],
+  ["medical", /\b(hurt|injured|injur|wounded|bleeding|bleed|medic|first aid|patch me)\b/],
+  ["joke", /\b(joke|funny|make me laugh|something funny)\b/],
   ["matrix", /\b(matrix|leadership|primus|cybertron|spark)\b/],
   ["earth", /\b(earth|human|humans|people|planet|home)\b/],
-  ["who", /\b(who are you|what'?s your name|your name|introduce yourself|what are you)\b/],
+  ["who", /\b(who are you|what'?s your name|your name|introduce yourself|what are you|who leads|who'?s in charge|leader)\b/],
   ["praise", /\b(good job|nice work|well done|great|awesome|thank you|thanks|love you|proud of you|amazing)\b/],
   ["insult", /\b(stupid|useless|idiot|dumb|hate you|shut up|trash|worthless)\b/],
-  ["order", /\b(go|do it|now|hurry|move|come on|lets go|let'?s go)\b/],
+  ["order", /\b(go|do it|now|hurry|move|come on|lets go|let'?s go|cover me|watch my back|protect)\b/],
   ["bye", /\b(bye|goodbye|sign off|out|later|see you|good night|goodnight)\b/],
   ["greet", /\b(hi|hello|hey|yo|greetings|good morning|good evening|what'?s up|howdy)\b/]
 ];
@@ -662,6 +692,7 @@ const state = {
   log: [],
   hearing: "",
   lastChatter: 0,
+  lastHuman: 0,
   destruct: 0
 };
 const lastLine = {};
@@ -819,9 +850,10 @@ function speak(b, text, opts){
     state.speaking = false;
     if(opts.onend) opts.onend();
   };
-  if(!state.voiceOn || !("speechSynthesis" in window)){
+  loadVoices();
+  if(!state.voiceOn || !("speechSynthesis" in window) || !voices.length){
     state.speaking = true;
-    const ms = Math.min(6000, 700 + clean.length * 45);
+    const ms = Math.min(7000, 900 + clean.length * 48);
     setTimeout(done, ms);
     return;
   }
@@ -1034,8 +1066,10 @@ function findIntent(t){
   if(/\?$/.test(t) || /^(what|why|how|when|where|can|could|will|would|should|do|does|is|are)\b/.test(t)) return "question";
   return "fallback";
 }
+const SPECIALTY = { medical:1, joke:1 };
 function pickLine(b, key){
-  const pool = (b[key] && b[key].length) ? b[key] : b.fallback;
+  let pool = (b[key] && b[key].length) ? b[key] : null;
+  if(!pool) pool = SPECIALTY[key] ? b.question : b.fallback;
   if(pool.length === 1) return pool[0];
   let line = pool[Math.floor(Math.random()*pool.length)];
   if(line === lastLine[b.id] && pool.length > 1){
@@ -1088,6 +1122,7 @@ function crosstalk(excludeId){
   const line = b.crosstalk[Math.floor(Math.random()*b.crosstalk.length)];
   setTimeout(() => {
     if(state.speaking) return;
+    if(Date.now() - (state.lastHuman || 0) < 1200) return;
     if(b.radio) SFX.static();
     logLine(b.id, "say", line, true);
     caption(b.id, line);
@@ -1125,6 +1160,7 @@ function handleUtterance(raw, source){
   // console commands
   if(runCommand(text, source)) return;
 
+  state.lastHuman = Date.now();
   const t = text.toLowerCase();
   const addressed = findAddressed(t);
   const wake = /\b(autobots?|command net|teletraan)\b/.test(t);
@@ -1142,6 +1178,7 @@ function handleUtterance(raw, source){
 
   let target = addressed;
   if(!target && wake) target = "optimus";
+  if(!target && /\b(leader|in charge|command|who leads)\b/.test(t)) target = "optimus";
   if(!target){
     if(!state.autoReply){
       logLine("teletraan","sys","Overheard. Address an Autobot by name, or turn AUTO on.",false);
@@ -1176,7 +1213,11 @@ function runCommand(text, source){
       logLine("teletraan","sys", HELP_TEXT, true);
       toast("COMMANDS LISTED IN LOG");
       return true;
-    case "ROSTER": case "WHO":
+    case "ROSTER":
+      logLine("teletraan","sys", BOTS.map(b=>b.short).join(" · "), true);
+      return true;
+    case "WHO":
+      if(rest) return false;
       logLine("teletraan","sys", BOTS.map(b=>b.short).join(" · "), true);
       return true;
     case "CALL": {
@@ -1321,6 +1362,7 @@ function scheduleChatter(){
     if(!state.netChat || state.speaking || state.destruct) return;
     if(document.hidden) return;
     if(Date.now() - state.lastChatter < 52000) return;
+    if(Date.now() - (state.lastHuman || 0) < 20000) return;
     if(Math.random() < 0.45) return;
     state.lastChatter = Date.now();
     const pool = BOTS.filter(b => !b.sys);
