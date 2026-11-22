@@ -693,6 +693,7 @@ const state = {
   hearing: "",
   lastChatter: 0,
   lastHuman: 0,
+  rollToken: null,
   destruct: 0
 };
 const lastLine = {};
@@ -837,6 +838,7 @@ function pickVoice(b){
 }
 let utter = null;
 function stopSpeech(){
+  state.rollToken = null;
   if("speechSynthesis" in window){
     try{ speechSynthesis.cancel(); }catch(e){}
   }
@@ -1080,6 +1082,7 @@ function pickLine(b, key){
 }
 function transmit(botId, text, opts){
   opts = opts || {};
+  state.rollToken = null;
   const b = bot(botId);
   if(b.radio) SFX.static();
   logLine(b.id, "say", text, true);
@@ -1134,8 +1137,11 @@ function rollCall(){
   const order = ["optimus","bumblebee","jazz","ironhide","ratchet","wheeljack","arcee","hotrod","magnus","redalert","blaster","grimlock"];
   logLine("teletraan","sys","Roll call initiated. Twelve units on the net.",true);
   SFX.open();
+  const token = {};
+  state.rollToken = token;
   let i = 0;
   const next = () => {
+    if(state.rollToken !== token) return;
     if(i >= order.length){
       setTimeout(()=>{ if(!state.speaking) transmit("optimus","All units accounted for. The net is yours."); }, 400);
       return;
@@ -1146,7 +1152,7 @@ function rollCall(){
     logLine(b.id, "say", line, true);
     caption(b.id, line);
     buzz(6);
-    speak(b, line, { onend: () => setTimeout(next, 260) });
+    speak(b, line, { onend: () => setTimeout(() => { if(state.rollToken === token) next(); }, 260) });
   };
   next();
 }
@@ -2138,6 +2144,7 @@ function boot(){
     const add = (rel, href) => { const l = document.createElement("link"); l.rel = rel; l.href = href; document.head.appendChild(l); };
     add("manifest", "manifest.webmanifest");
     add("apple-touch-icon", "icon-192.png");
+    add("icon", "favicon-32.png");
     if("serviceWorker" in navigator){
       navigator.serviceWorker.register("sw.js").catch(()=>{});
     }
