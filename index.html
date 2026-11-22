@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#070d14">
+<meta name="description" content="Autobot Command Net AB-2026: a Cybertronian communicator with live voice recognition, twelve voiced Autobots led by Optimus Prime, and an always-on comms net.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Autobot Command Net · AB-2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#04070b; --screen:#070d14; --screen2:#0a131d;
+  --steel:#161e27; --steel2:#212c38; --steel3:#2b3948;
+  --edge:#3d4f63; --edge2:#54708c;
+  --ink:#d3e6fa; --dim:#6f879f; --dimmer:#4a5d70;
+  --red:#e03a2f; --blue:#3d7bff; --gold:#f0b429; --cyan:#5fd0ff;
+  --ok:#3fe08a; --warn:#ffb84d; --bad:#ff5a5a;
+  --bot:#5fd0ff;
+  --pad:10px; --r-dev:26px; --r-scr:16px;
+}
+html,body{height:100%}
+body{
+  margin:0; background:
+    radial-gradient(120% 75% at 50% -12%, #16324e 0%, #0a1420 42%, #04070b 100%), #04070b;
+  color:var(--ink);
+  font-family:"SF Mono",ui-monospace,"Roboto Mono",Menlo,Consolas,monospace;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; overscroll-behavior:none; -webkit-tap-highlight-color:transparent;
+  font-size:13px;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.5;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(120,180,255,.035) 0 1px,transparent 1px 44px),
+    repeating-linear-gradient(90deg,rgba(0,0,0,.4) 0 2px,transparent 2px 96px);
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit;background:none;border:0;outline:none}
+::-webkit-scrollbar{width:0;height:0}
+
+/* ---------- rig ---------- */
+.rig{
+  position:relative; z-index:1; width:100%; max-width:540px;
+  height:100dvh; max-height:100dvh; padding:7px;
+  display:flex; flex-direction:column; min-height:0;
+}
+.device{
+  position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+  border-radius:var(--r-dev); padding:9px 9px 7px;
+  background:linear-gradient(180deg,#2a3746 0%,#1b2530 16%,#141c25 60%,#0e151d 100%);
+  border:1px solid #3b4c5e;
+  box-shadow:0 22px 44px -14px #000, inset 0 1px 0 rgba(255,255,255,.14), inset 0 -2px 0 rgba(0,0,0,.55);
+}
+/* shell trim: autobot red/blue spine */
+.device::before{
+  content:""; position:absolute; left:16%; right:16%; top:2px; height:3px; border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--red) 18%,var(--red) 46%,var(--blue) 54%,var(--blue) 82%,transparent);
+  opacity:.85; filter:drop-shadow(0 0 5px rgba(224,58,47,.5));
+}
+.device::after{
+  content:""; position:absolute; inset:5px; border-radius:22px; pointer-events:none;
+  border:1px solid rgba(150,190,230,.07);
+}
+.screen{
+  position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+  border-radius:var(--r-scr); overflow:hidden;
+  background:
+    radial-gradient(110% 70% at 50% 0%, #102234 0%, var(--screen2) 45%, var(--screen) 100%);
+  border:1px solid #0b131b;
+  box-shadow:inset 0 0 0 1px rgba(120,190,255,.09), inset 0 0 42px rgba(0,0,0,.85);
+}
+.screen::after{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:20; opacity:.55;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.26) 0 1px,transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+.screen::before{
+  content:""; position:absolute; inset:0; pointer-events:none; z-index:21;
+  background:radial-gradient(120% 90% at 50% 50%,transparent 55%,rgba(0,0,0,.55) 100%);
+}
+
+/* ---------- header ---------- */
+.top{
+  display:flex; align-items:center; gap:8px; padding:7px 9px 6px;
+  border-bottom:1px solid rgba(95,208,255,.16);
+  background:linear-gradient(180deg,rgba(20,44,68,.9),rgba(10,20,30,.2));
+  flex:none; z-index:2;
+}
+.sigil{width:24px;height:24px;flex:none;filter:drop-shadow(0 0 6px rgba(224,58,47,.55))}
+.brand{display:flex;flex-direction:column;line-height:1.05;min-width:0;flex:1}
+.brand b{font-size:10.5px;letter-spacing:.16em;color:#eaf4ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand span{font-size:7.5px;letter-spacing:.22em;color:var(--dim)}
+.pills{display:flex;gap:4px;flex:none}
+.pill{
+  font-size:7px; letter-spacing:.1em; padding:3px 5px; border-radius:4px;
+  border:1px solid var(--dimmer); color:var(--dim); white-space:nowrap;
+}
+.pill.on{color:var(--ok);border-color:rgba(63,224,138,.55);background:rgba(63,224,138,.1);box-shadow:0 0 8px rgba(63,224,138,.25) inset}
+.pill.hot{color:var(--red);border-color:rgba(224,58,47,.6);background:rgba(224,58,47,.14);animation:pulsePill 1.1s infinite}
+@keyframes pulsePill{50%{opacity:.45}}
+
+/* ---------- roster rail ---------- */
+.rail{
+  display:flex; gap:5px; padding:6px 8px; overflow-x:auto; overflow-y:hidden;
+  flex:none; scroll-snap-type:x proximity;
+  border-bottom:1px solid rgba(95,208,255,.1);
+  background:linear-gradient(180deg,rgba(8,18,28,.5),transparent);
+  -webkit-overflow-scrolling:touch;
+}
+.chip{
+  flex:none; width:47px; display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:3px 2px; border-radius:8px; border:1px solid transparent; scroll-snap-align:center;
+  transition:background .15s,border-color .15s,transform .12s;
+}
+.chip canvas{width:34px;height:34px;border-radius:6px;display:block;background:#050b12;border:1px solid rgba(120,170,220,.18)}
+.chip i{font-style:normal;font-size:6.5px;letter-spacing:.04em;color:var(--dim);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.sel{border-color:rgba(95,208,255,.5);background:rgba(95,208,255,.1)}
+.chip.sel i{color:#dff2ff}
+.chip.live canvas{box-shadow:0 0 0 1px var(--bot),0 0 12px -2px var(--bot)}
+.chip:active{transform:scale(.94)}
+
+/* ---------- stage ---------- */
+.stage{
+  position:relative; flex:1; min-height:0; display:flex; flex-direction:column;
+  padding:6px 9px 4px; gap:4px; overflow:hidden;
+}
+.holo{
+  position:relative; flex:1; min-height:0; border-radius:12px; overflow:hidden;
+  border:1px solid rgba(95,208,255,.16);
+  background:radial-gradient(80% 90% at 50% 45%,rgba(20,50,80,.5),rgba(4,10,16,.9));
+}
+.holo canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.holo-tag{
+  position:absolute; left:6px; top:5px; z-index:3; display:flex; flex-direction:column; gap:1px;
+  pointer-events:none;
+}
+.holo-tag b{font-size:11px;letter-spacing:.1em;color:#eaf6ff;text-shadow:0 0 10px rgba(95,208,255,.7)}
+.holo-tag span{font-size:7px;letter-spacing:.18em;color:var(--dim)}
+.holo-tag em{font-style:normal;font-size:6.5px;letter-spacing:.14em;color:var(--bot)}
+.corner{position:absolute;width:12px;height:12px;border:1px solid rgba(95,208,255,.5);z-index:3;pointer-events:none}
+.corner.tl{left:4px;top:4px;border-right:0;border-bottom:0}
+.corner.tr{right:4px;top:4px;border-left:0;border-bottom:0}
+.corner.bl{left:4px;bottom:4px;border-right:0;border-top:0}
+.corner.br{right:4px;bottom:4px;border-left:0;border-top:0}
+
+/* live audio meters */
+.meters{position:absolute;right:5px;bottom:5px;z-index:3;display:flex;align-items:flex-end;gap:2px;height:22px;pointer-events:none}
+.meters i{display:block;width:3px;background:linear-gradient(180deg,var(--bot),rgba(95,208,255,.15));border-radius:1px;height:20%;transition:height .07s linear;opacity:.9}
+
+.caption{
+  flex:none; min-height:34px; max-height:52px; overflow:hidden;
+  font-size:10.5px; line-height:1.35; color:#dceeff;
+  padding:5px 7px; border-radius:8px;
+  background:linear-gradient(180deg,rgba(12,28,44,.85),rgba(8,18,28,.6));
+  border-left:2px solid var(--bot);
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical;
+  text-shadow:0 0 12px rgba(95,208,255,.25);
+}
+.caption .who{color:var(--bot);font-size:8px;letter-spacing:.12em;display:block;margin-bottom:1px}
+.caption.idle{color:var(--dim);border-left-color:var(--dimmer);font-style:italic}
+
+/* ---------- log ---------- */
+.log{
+  flex:none; height:74px; overflow-y:auto; padding:3px 9px 4px;
+  font-size:9px; line-height:1.45; border-top:1px solid rgba(95,208,255,.1);
+  background:rgba(3,8,13,.55); scroll-behavior:smooth;
+}
+.log div{display:flex;gap:5px;padding:1px 0;opacity:.92}
+.log time{color:var(--dimmer);flex:none;font-size:8px}
+.log b{flex:none;font-weight:600;letter-spacing:.02em}
+.log span{color:#a9c2d8;min-width:0;overflow-wrap:anywhere}
+.log .sys span{color:var(--dim);font-style:italic}
+.log .sys b{color:var(--gold)}
+
+/* ---------- controls ---------- */
+.ctrl{display:flex;gap:5px;padding:5px 9px 4px;flex:none}
+.btn{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  padding:6px 3px; border-radius:9px; min-height:44px;
+  border:1px solid var(--edge); background:linear-gradient(180deg,#22303e,#161f29);
+  font-size:8px; letter-spacing:.1em; color:#b9cfe2;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 2px 6px -2px #000;
+  transition:transform .1s, box-shadow .15s, color .15s, border-color .15s;
+}
+.btn b{font-size:13px;line-height:1;font-weight:400}
+.btn:active{transform:translateY(1px) scale(.985)}
+.btn.on{color:#031;border-color:rgba(63,224,138,.6);background:linear-gradient(180deg,#2b7d55,#1a5637);box-shadow:0 0 14px -2px rgba(63,224,138,.6), inset 0 1px 0 rgba(255,255,255,.2);color:#eafff3}
+.btn.live{color:#fff;border-color:rgba(224,58,47,.75);background:linear-gradient(180deg,#c8342a,#8a2019);box-shadow:0 0 16px -2px rgba(224,58,47,.75);animation:breathe 1.6s ease-in-out infinite}
+@keyframes breathe{50%{box-shadow:0 0 24px 0 rgba(224,58,47,.9)}}
+.btn.tx{color:#fff;border-color:rgba(95,208,255,.8);background:linear-gradient(180deg,#2f6fd0,#1c4785);box-shadow:0 0 16px -2px rgba(61,123,255,.8)}
+.btn[disabled]{opacity:.45}
+
+/* ---------- console ---------- */
+.console{
+  display:flex;align-items:center;gap:5px;flex:none;
+  padding:4px 9px 7px;
+}
+.console span{color:var(--bot);font-size:11px}
+.console input{
+  flex:1;min-width:0;font-size:10.5px;padding:6px 8px;border-radius:7px;
+  background:rgba(4,12,20,.85);border:1px solid rgba(95,208,255,.2);color:#dff1ff;
+}
+.console input::placeholder{color:var(--dimmer);font-size:9.5px}
+.console button{
+  flex:none;padding:6px 9px;border-radius:7px;font-size:8px;letter-spacing:.1em;
+  border:1px solid var(--edge);background:linear-gradient(180deg,#22303e,#161f29);color:#b9cfe2;
+}
+
+/* ---------- fx ---------- */
+.screen.warp{animation:warp .55s ease}
+@keyframes warp{
+  0%{filter:none}
+  22%{filter:brightness(1.7) hue-rotate(-14deg) contrast(1.25)}
+  45%{filter:brightness(.7) hue-rotate(12deg)}
+  70%{filter:brightness(1.4) contrast(1.1)}
+  100%{filter:none}
+}
+.flash{position:absolute;inset:0;z-index:19;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 50%,#bfe9ff,#3d7bff 60%,transparent 72%)}
+.flash.go{animation:flashGo .5s ease-out}
+@keyframes flashGo{0%{opacity:.85}100%{opacity:0}}
+.toast{
+  position:absolute;left:50%;bottom:58px;transform:translate(-50%,8px);z-index:22;
+  padding:5px 10px;border-radius:6px;font-size:9px;letter-spacing:.08em;
+  background:rgba(6,16,26,.95);border:1px solid rgba(95,208,255,.45);color:#dff2ff;
+  opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:92%;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-height:640px){
+  .log{height:58px}
+  .caption{max-height:44px;min-height:30px;font-size:10px}
+  .btn{min-height:40px}
+  .rail{padding:4px 8px}
+  .chip canvas{width:30px;height:30px}
+  .chip{width:43px}
+}
+@media (max-height:560px){
+  .log{height:46px}
+  .brand span{display:none}
+  .holo-tag b{font-size:10px}
+}
+@media (min-width:520px) and (min-height:760px){
+  .log{height:96px}
+  .chip canvas{width:38px;height:38px}
+  .chip{width:52px}
+  .caption{font-size:11.5px}
+}
+</style>
+</head>
+<body>
+<div class="rig">
+  <div class="device">
+    <div class="screen" id="screen">
+      <header class="top">
+        <svg class="sigil" viewBox="0 0 48 48" aria-hidden="true">
+          <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ff5a4a"/><stop offset="1" stop-color="#c22a20"/></linearGradient></defs>
+          <path d="M24 3 L31 12 L37 10 L39 20 L44 24 L39 28 L37 38 L31 36 L24 45 L17 36 L11 38 L9 28 L4 24 L9 20 L11 10 L17 12 Z"
+                fill="url(#sg)" stroke="#7d1a14" stroke-width="1.2"/>
+          <path d="M15 19 L21 21 L21 27 L15 25 Z" fill="#0a1420"/>
+          <path d="M33 19 L27 21 L27 27 L33 25 Z" fill="#0a1420"/>
+          <path d="M18 30 L24 34 L30 30 L30 33 L24 37 L18 33 Z" fill="#0a1420"/>
+        </svg>
+        <div class="brand">
+          <b>AUTOBOT COMMAND NET</b>
+          <span>AB-2026 · TELETRAAN-1 LINK</span>
+        </div>
+        <div class="pills">
+          <div class="pill" id="pillMic">MIC</div>
+          <div class="pill" id="pillHear">HEAR</div>
+          <div class="pill on" id="pillNet">NET</div>
+        </div>
+      </header>
+
+      <div class="rail" id="rail"></div>
+
+      <section class="stage">
+        <div class="holo" id="holo">
+          <canvas id="holoCanvas"></canvas>
+          <div class="corner tl"></div><div class="corner tr"></div>
+          <div class="corner bl"></div><div class="corner br"></div>
+          <div class="holo-tag">
+            <b id="holoName">OPTIMUS PRIME</b>
+            <span id="holoRank">AUTOBOT COMMANDER</span>
+            <em id="holoState">CHANNEL OPEN</em>
+          </div>
+          <div class="meters" id="meters"></div>
+        </div>
+        <div class="caption idle" id="caption"><span class="who">NET</span>Autobot Command Net standing by. Tap a face, then talk.</div>
+      </section>
+
+      <div class="log" id="log"></div>
+
+      <div class="ctrl">
+        <button class="btn" id="btnListen"><b>◉</b>LISTEN</button>
+        <button class="btn" id="btnAuto"><b>∞</b>AUTO</button>
+        <button class="btn on" id="btnNet"><b>≈</b>NET</button>
+        <button class="btn" id="btnVoice"><b>◂)</b>VOICE</button>
+      </div>
+
+      <form class="console" id="consoleForm" autocomplete="off">
+        <span>&gt;</span>
+        <input id="cmd" placeholder="say something, or type  HELP" enterkeyhint="send" autocapitalize="off" spellcheck="false">
+        <button type="submit">SEND</button>
+      </form>
+      <div class="flash" id="flash"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   AUTOBOT COMMAND NET — AB-2026
+   unit DL-2026 · Teletraan-1 uplink
+   ============================================================ */
+"use strict";
+
+const VERSION = "AB-2026.1";
+const LS_KEY = "autobot_ab2026_v1";
+
+/* ---------- roster ---------- */
+const BOTS = [
+  {
+    id:"optimus", name:"Optimus Prime", short:"OPTIMUS", rank:"AUTOBOT COMMANDER", tag:"PRIME",
+    color:"#e03a2f", accent:"#3d7bff", voice:{pitch:0.42, rate:0.80, prefer:/daniel|david|google uk english male|male/i},
+    gfx:{helm:"#2f5fc4", trim:"#d8e2ee", optics:"#7fe0ff", face:"#1b3f8f", shape:"prime", antennae:true, crest:true, faceplate:true, chest:"#c8332a"},
+    greet:["I am here. Report, and speak plainly.","Optimus Prime. The net is open and I am listening."],
+    who:["I am Optimus Prime, leader of the Autobots. We came to this world as refugees. We stayed as guardians."],
+    status:["All twelve units accounted for. Energon reserves are holding. The net is quiet, for now.","Teletraan-1 reports no hostile signatures within the perimeter. We remain ready."],
+    rollcall:["Autobots, sound off. Every voice on this channel.","Roll call. Confirm your designation, one at a time."],
+    transform:["Autobots, transform and roll out.","Then we move. Transform, and keep formation."],
+    decepticon:["The Decepticons do not rest, and neither do we. Stay sharp.","Megatron will test us again. He always does. We will be ready."],
+    energon:["Energon is life, and it is finite. We spend it with care.","Reserves are adequate. Do not waste what we cannot replace."],
+    earth:["This world took us in. We defend it as our own.","Humans taught us that freedom is not a gift. It is a choice, made daily."],
+    matrix:["The Matrix is not a weapon. It is a burden, and a promise.","Leadership is not the Matrix in my chest. It is the choice to stand in front of others."],
+    praise:["Thank you. But the credit belongs to every Autobot on this net."],
+    insult:["Your anger is noted. When you are ready to speak as allies, I will be here."],
+    order:["Understood. Moving now.","Consider it done. Optimus out."],
+    question:["I will give you the honest answer, not the easy one.","Ask me plainly and I will tell you what I know."],
+    bye:["Until all are one.","Optimus out. Keep your optics open."],
+    fallback:["I hear you. Say it again, and be specific.","The channel is yours. Speak."],
+    ambient:["All units, maintain your positions.","The net is quiet. That is when I worry most.","Bumblebee, keep your optics on the eastern ridge.","One day this war ends. Until then, we stand."],
+    crosstalk:["Optimus is right.","You heard the commander."]
+  },
+  {
+    id:"bumblebee", name:"Bumblebee", short:"BUMBLEBEE", rank:"SCOUT · RECON", tag:"BEE",
+    color:"#f2c21a", accent:"#f2c21a", radio:true, voice:{pitch:1.55, rate:1.22, prefer:/zira|samantha|female|google us english/i},
+    gfx:{helm:"#e8b512", trim:"#22262c", optics:"#8fe8ff", face:"#2a2c30", shape:"round", horns:true, faceplate:false, chest:"#e8b512"},
+    greet:["[radio] Hey! You're on the net. I've been waiting.","[radio] Bumblebee here. Talk to me, I'm listening."],
+    who:["[radio] I'm Bumblebee. Scout. Fastest set of wheels on this rock."],
+    status:["[radio] Clear skies, clear roads, nothing on my scanners.","[radio] All quiet. Kinda boring, honestly."],
+    rollcall:["[radio] Bumblebee, present and rolling!"],
+    transform:["[radio] Already transformed. Beat you to it."],
+    decepticon:["[radio] Decepticons? Point me at them.","[radio] Let them come. I know these back roads better than they do."],
+    energon:["[radio] I could use a top-off. Just saying."],
+    earth:["[radio] I love this planet. The music, the roads, the people.","[radio] Best place we've ever landed. Don't tell the others I said that."],
+    matrix:["[radio] The Matrix? Heavy stuff. I just drive fast and stay loyal."],
+    praise:["[radio] Aw, thanks! That means a lot."],
+    insult:["[radio] Hey. That was uncalled for."],
+    order:["[radio] On it!","[radio] You got it. Rolling."],
+    question:["[radio] Good question. Lemme think on it while I drive.","[radio] Ask me again in a minute, I'm mid-scan."],
+    bye:["[radio] Catch you later. Bee out."],
+    fallback:["[radio] Didn't catch that. Say it again?","[radio] Static on my end. Repeat?"],
+    ambient:["[radio] Anyone else hear that? No? Just me.","[radio] I'm gonna do a lap around the perimeter.","[radio] Radio check, radio check. All good."],
+    crosstalk:["[radio] What he said!","[radio] I'm with you on that."]
+  },
+  {
+    id:"jazz", name:"Jazz", short:"JAZZ", rank:"SPECIAL OPS", tag:"OPS",
+    color:"#e8eef6", accent:"#3d7bff", voice:{pitch:0.95, rate:1.00, prefer:/google us english|samantha|female|zira/i},
+    gfx:{helm:"#e6ebf2", trim:"#1f4fb8", optics:"#6fd8ff", visor:true, face:"#c9d4e0", shape:"visor", chest:"#dfe6ee"},
+    greet:["Jazz on the wire. What's the word?","Yo, you're loud and clear. Let's move."],
+    who:["Name's Jazz. Special ops. I handle the jobs nobody wants on the record."],
+    status:["Smooth sailing, boss. Nothing but clean channels.","Systems green. Style: impeccable."],
+    rollcall:["Jazz, in the house."],
+    transform:["Let's ride."],
+    decepticon:["Those chrome-plated clowns? I've got a few ideas.","Decepticons don't improvise. That's how we beat them."],
+    energon:["Energon's fine. My playlist is better."],
+    earth:["Earth's got rhythm. That's why I like it here.","I came for the mission. I stayed for the music."],
+    matrix:["Heavy metal crown, that thing. I'll leave it with Prime."],
+    praise:["Appreciate that. I'll keep it smooth."],
+    insult:["Whoa. Cool your circuits."],
+    order:["On it.","Done and done."],
+    question:["I hear you. Here's how I see it.","Straight up? Ask me something easier."],
+    bye:["Later, friend."],
+    fallback:["Say again? Channel's a little fuzzy.","Didn't land. Run it back."],
+    ambient:["Anybody got a beat? This net is too quiet.","I'm gonna take the long way back.","Keep it smooth, people."],
+    crosstalk:["Yeah, that tracks.","I'll second that."]
+  },
+  {
+    id:"ironhide", name:"Ironhide", short:"IRONHIDE", rank:"WEAPONS OFFICER", tag:"GUNS",
+    color:"#8f2b25", accent:"#8f2b25", voice:{pitch:0.48, rate:0.86, prefer:/daniel|david|google uk english male|male/i},
+    gfx:{helm:"#7d2a24", trim:"#8d949c", optics:"#ffb35c", face:"#3a2b28", shape:"heavy", chest:"#6f241f"},
+    greet:["Ironhide here. Make it quick, I'm cleaning my cannons.","Yeah, I hear ya. What's the problem?"],
+    who:["Ironhide. Weapons officer. I've been shootin' Decepticons since before your planet had roads."],
+    status:["Weapons hot, armor dented, attitude worse. All normal.","Everything's bolted down and loaded. Just how I like it."],
+    rollcall:["Ironhide. Present. Obviously."],
+    transform:["Finally. Let's go break somethin'."],
+    decepticon:["Decepticons. Good. I was gettin' bored.","Point me at 'em. I'll make a mess."],
+    energon:["Energon's low. So's my patience. Fix one of 'em."],
+    earth:["Planet's fine. Too many soft spots. Needs more armor."],
+    matrix:["Matrix. Fancy paperweight if you ask me."],
+    praise:["Don't get sappy. Just buy me a new cannon."],
+    insult:["Say that again. Closer. I dare ya."],
+    order:["Already movin'.","Done. What's next?"],
+    question:["Ask it straight, I ain't a philosopher.","Hmph. I got an opinion. You won't like it."],
+    bye:["Ironhide out. Try not to get scrapped."],
+    fallback:["Speak up! My audio's older than you are.","That was gibberish. Try again."],
+    ambient:["Who scratched my paint? I'll find out.","Somebody check the west perimeter.","I don't trust quiet nights."],
+    crosstalk:["Damn right.","Couldn't have said it better."]
+  },
+  {
+    id:"ratchet", name:"Ratchet", short:"RATCHET", rank:"CHIEF MEDICAL", tag:"MED",
+    color:"#e6ebf2", accent:"#e03a2f", voice:{pitch:0.78, rate:0.94, prefer:/daniel|david|google uk english male|male/i},
+    gfx:{helm:"#e9edf3", trim:"#c8332a", optics:"#7fd4ff", face:"#c3ccd6", shape:"crest", crest:true, faceplate:true, chest:"#dfe6ee"},
+    greet:["Ratchet. If this is another sprained servo, I'm billing you.","Medical channel open. What did you break?"],
+    who:["I'm Ratchet. Chief medical officer. I keep these idiots functional."],
+    status:["Twelve units, eleven of them idiots, all of them alive. Status: acceptable.","My supplies are low and my patience is lower."],
+    rollcall:["Ratchet. Present. And busy."],
+    transform:["Transform, carefully. I don't want to weld anyone today."],
+    decepticon:["Every Decepticon attack is a waiting room full of my patients. Stop them."],
+    energon:["Energon levels are adequate. Hydration, however, is a human problem I cannot fix."],
+    earth:["Their medicine is primitive. Their stubbornness is universal."],
+    matrix:["The Matrix can't fix a cracked spark casing. Trust me, I've asked."],
+    praise:["Mm. Hold still, you're not done healing."],
+    insult:["Insult the medic. Bold. You'll need me later."],
+    order:["Fine. Moving. Slowly.","Done. Now hold still."],
+    question:["I have an answer. You may not enjoy it.","Medically speaking? Ask a real question."],
+    bye:["Ratchet out. Take your maintenance seriously."],
+    fallback:["I heard noise, not words. Try again.","Say that in a language I can diagnose."],
+    ambient:["Who left tools in the bay again?","I need three more crates of coolant.","Nobody transform until I finish this weld."],
+    crosstalk:["Correct, and I've said it before.","Listen to him."]
+  },
+  {
+    id:"wheeljack", name:"Wheeljack", short:"WHEELJACK", rank:"CHIEF ENGINEER", tag:"ENG",
+    color:"#e6ebf2", accent:"#3fe08a", voice:{pitch:1.12, rate:1.08, prefer:/google uk english male|daniel|male/i},
+    gfx:{helm:"#e9edf3", trim:"#2fbf74", optics:"#9fffcb", face:"#cdd6e0", shape:"fin", fins:true, faceplate:true, chest:"#dfe6ee"},
+    greet:["Wheeljack! Ooh, I have something to show you. It only exploded twice.","Engineer online. Probability of success: sixty percent. Give or take."],
+    who:["Wheeljack, chief engineer. If it moves, I built it. If it exploded, I built it twice."],
+    status:["Reactor stable. Mostly. That humming is normal. I think.","Three projects running, two of them on fire. Standard."],
+    rollcall:["Wheeljack here! Hold on, hands full."],
+    transform:["Transformation sequence is at ninety-four percent reliability. Go ahead."],
+    decepticon:["I built something for them. It's a surprise. It has a timer."],
+    energon:["I can stretch the energon. Probably. Don't quote me."],
+    earth:["Human engineering is beautiful. Terrible, but beautiful."],
+    matrix:["I tried to scan the Matrix once. I woke up three days later."],
+    praise:["Ha! I'll put that on the wall."],
+    insult:["Criticism noted. Filed under 'people who can't build'."],
+    order:["On it. Stand back.","Compiling. Almost. There."],
+    question:["Good question! Wrong engineer. But I'll guess.","I have a theory. It's probably dangerous."],
+    bye:["Wheeljack out. Don't touch the blue one."],
+    fallback:["Couldn't parse that. My audio filter's experimental.","Repeat? I was welding."],
+    ambient:["Test number forty-one. This one's the one.","If anyone finds a loose gyro, it's mine.","Don't touch the blue one."],
+    crosstalk:["Statistically, he's right.","I can build that."]
+  },
+  {
+    id:"arcee", name:"Arcee", short:"ARCEE", rank:"SCOUT · MARKSMAN", tag:"ARC",
+    color:"#e055a8", accent:"#e055a8", voice:{pitch:1.30, rate:1.02, prefer:/zira|samantha|female|google us english/i},
+    gfx:{helm:"#d94f9f", trim:"#2a2f3a", optics:"#9fe8ff", face:"#2c2530", shape:"slim", chest:"#c93f8f"},
+    greet:["Arcee. I'm listening. Make it count.","You're on my channel. Good. I was getting restless."],
+    who:["Arcee. Scout, marksman, and the one who notices what everyone else misses."],
+    status:["Scanners clean. My rifle's cleaner.","Quiet sector. I don't like quiet sectors."],
+    rollcall:["Arcee. Present."],
+    transform:["Moving out. Try to keep up."],
+    decepticon:["I've dropped bigger Decepticons from further away.","Give me a perch and a clear line of sight."],
+    energon:["Energon's fine. Precision costs less than brute force."],
+    earth:["This planet has better sunsets than Cybertron ever did."],
+    matrix:["The Matrix chose him. I chose to follow. That's the difference."],
+    praise:["Good. Now let's keep it that way."],
+    insult:["Careful. I have excellent aim and a long memory."],
+    order:["Already there.","Done. What's the next target?"],
+    question:["Straight answer: it depends on what you're willing to lose.","Ask me again when it matters."],
+    bye:["Arcee out. Stay low."],
+    fallback:["Didn't copy. Say it clean.","Channel's noisy. Repeat."],
+    ambient:["Movement on the north ridge. Probably nothing. Probably.","I'll take the high ground.","Somebody should check on Bumblebee."],
+    crosstalk:["Agreed.","He's not wrong."]
+  },
+  {
+    id:"hotrod", name:"Hot Rod", short:"HOT ROD", rank:"CAVALIER", tag:"ROD",
+    color:"#e8622a", accent:"#ffb02e", voice:{pitch:1.00, rate:1.12, prefer:/google us english|male|daniel/i},
+    gfx:{helm:"#d8452a", trim:"#ffb02e", optics:"#8fe0ff", face:"#3a2a26", shape:"flame", faceplate:false, chest:"#d8452a"},
+    greet:["Hot Rod! Finally, someone who wants to do something.","You rang? I was already halfway there."],
+    who:["Hot Rod. Fastest thing on four wheels, and I've got the tickets to prove it."],
+    status:["Everything's running hot. That's how I like it.","No problems here. Well. One. But it's small."],
+    rollcall:["Hot Rod, ready to go!"],
+    transform:["Now you're talking. Transform and GO."],
+    decepticon:["Decepticons? I'll race 'em there and finish it before backup arrives."],
+    energon:["Low on energon, high on confidence."],
+    earth:["Earth's got open roads. That's all I need."],
+    matrix:["One day that's gonna be my problem. Not today."],
+    praise:["Told you I could do it."],
+    insult:["Hey! I'm right here."],
+    order:["On it, boss!","Already moving!"],
+    question:["Easy. Here's what I'd do.","Depends. Are we allowed to break the rules?"],
+    bye:["Hot Rod, out. Catch me if you can."],
+    fallback:["Say again? I was going fast.","What? Repeat!"],
+    ambient:["Anyone up for a race? No? Cowards.","I'm taking the canyon route.","Bet I can beat my last time."],
+    crosstalk:["That's what I've been saying!","Let's go already."]
+  },
+  {
+    id:"magnus", name:"Ultra Magnus", short:"ULTRA MAGNUS", rank:"CITY COMMANDER", tag:"MAG",
+    color:"#3d7bff", accent:"#d8e2ee", voice:{pitch:0.58, rate:0.90, prefer:/daniel|david|google uk english male|male/i},
+    gfx:{helm:"#2f5fc4", trim:"#d8e2ee", optics:"#8fe0ff", faceplate:true, face:"#22417f", shape:"block", chest:"#2f5fc4"},
+    greet:["Ultra Magnus. State your business.","Channel acknowledged. Proceed."],
+    who:["Ultra Magnus. City commander. I hold the line when Prime is elsewhere."],
+    status:["All checkpoints reporting. Nothing to report beyond that.","Defenses nominal. Discipline, however, needs work."],
+    rollcall:["Ultra Magnus, reporting."],
+    transform:["All units, transform. Maintain formation. No exceptions."],
+    decepticon:["Threat assessment: severe. Response: overwhelming.","We hold the line. That is all."],
+    energon:["Rationing is in effect until reserves are confirmed."],
+    earth:["A chaotic world. It responds well to procedure."],
+    matrix:["The Matrix is Prime's responsibility. Mine is the wall behind him."],
+    praise:["Noted. Discipline produces results."],
+    insult:["I have been called worse by better."],
+    order:["Executing.","Order acknowledged and underway."],
+    question:["There is a correct answer. I will give it to you.","Clarify the parameters and I will answer."],
+    bye:["Ultra Magnus out."],
+    fallback:["Transmission unclear. Repeat, formatted.","I require a clearer signal."],
+    ambient:["All checkpoints, report.","Formation drill at oh-six-hundred.","This is not a drill. It is a reminder."],
+    crosstalk:["Correct.","As ordered."]
+  },
+  {
+    id:"redalert", name:"Red Alert", short:"RED ALERT", rank:"SECURITY", tag:"SEC",
+    color:"#e6ebf2", accent:"#e03a2f", voice:{pitch:1.02, rate:1.16, prefer:/google us english|male|zira/i},
+    gfx:{helm:"#e9edf3", trim:"#d8342a", optics:"#ff9f6a", face:"#c3ccd6", shape:"chevron", crest:true, faceplate:false, chest:"#e9edf3"},
+    greet:["Red Alert! I've been monitoring this channel. Everything okay? Everything's okay.","Security here. I already logged this transmission."],
+    who:["Red Alert. Security officer. I see the threat before it happens."],
+    status:["I have fourteen concerns. Twelve are minor. Two are not.","Perimeter is secure. Probably. I'm checking again."],
+    rollcall:["Red Alert, present and watching!"],
+    transform:["Transforming. Slowly. Safely. Please don't rush me."],
+    decepticon:["Decepticon activity? Where? How many? Why didn't I know first?"],
+    energon:["Energon reserves are a security risk. Someone should fix that."],
+    earth:["Too many blind corners on this planet. It's a nightmare."],
+    matrix:["The Matrix is a strategic asset. It should be guarded better."],
+    praise:["Good. Good. Now let me double-check."],
+    insult:["That's exactly the kind of talk that precedes a breach."],
+    order:["On it. Logging it. Done.","Executing. With precautions."],
+    question:["I have an answer and three possible worst-case scenarios.","Ask, but quietly. Sound carries."],
+    bye:["Red Alert out. I'll be watching."],
+    fallback:["I didn't get that. Could be interference. Could be sabotage.","Repeat. Slowly."],
+    ambient:["Does anyone else hear that hum? Anyone?","I'm running a third perimeter sweep.","That door was open. I know it was open."],
+    crosstalk:["I've been saying that for weeks!","Exactly! Thank you!"]
+  },
+  {
+    id:"blaster", name:"Blaster", short:"BLASTER", rank:"COMMUNICATIONS", tag:"COMMS",
+    color:"#3d7bff", accent:"#ffb02e", voice:{pitch:0.92, rate:1.05, prefer:/google us english|male/i},
+    gfx:{helm:"#2f5fc4", trim:"#ffb02e", optics:"#ffd36a", visor:true, face:"#1f3f7f", shape:"dj", chest:"#2f5fc4"},
+    greet:["Blaster on the decks! You're comin' through loud and funky.","Comms hub, live and direct. What's the request?"],
+    who:["Blaster. I run the airwaves. Every signal on this planet passes my console."],
+    status:["All frequencies clean. Got six stations and a pirate broadcast.","Comms are solid. The playlist is better."],
+    rollcall:["Blaster in the mix!"],
+    transform:["Roll out, and keep it loud."],
+    decepticon:["I'll jam their signal so hard they'll be talkin' in static."],
+    energon:["Energon low? Turn it up, it'll feel better."],
+    earth:["Earth's got the best music in the galaxy. No contest."],
+    matrix:["The Matrix? Can't broadcast that. Trust me, I tried."],
+    praise:["Respect. I'll drop that on the next broadcast."],
+    insult:["Hey now, no static on my channel."],
+    order:["On the one. Moving.","Done deal."],
+    question:["I got an answer and a soundtrack for it.","Ask away, I'm all ears and speakers."],
+    bye:["Blaster, signin' off. Stay loud."],
+    fallback:["Signal's rough. Run it back one time.","Say what? Repeat the word."],
+    ambient:["Check one two, check one two.","Anybody got requests?","This next one goes out to the whole net."],
+    crosstalk:["Word.","I'm with that."]
+  },
+  {
+    id:"grimlock", name:"Grimlock", short:"GRIMLOCK", rank:"DINOBOT COMMANDER", tag:"DINO",
+    color:"#f0b429", accent:"#8d949c", voice:{pitch:0.30, rate:0.68, prefer:/david|daniel|male/i},
+    gfx:{helm:"#c99a1e", trim:"#8d949c", optics:"#ff9a3c", face:"#4a3612", shape:"dino", dino:true, chest:"#b98a18"},
+    greet:["ME GRIMLOCK HEAR YOU.","GRIMLOCK HERE. TALK. GRIMLOCK LISTEN."],
+    who:["ME GRIMLOCK. KING. STRONGEST AUTOBOT. THAT ALL."],
+    status:["GRIMLOCK FINE. EVERYTHING FINE. NO PROBLEM GRIMLOCK CANNOT BITE."],
+    rollcall:["GRIMLOCK PRESENT! GRIMLOCK ALWAYS PRESENT!"],
+    transform:["GRIMLOCK TRANSFORM. THINGS GET BROKEN. GOOD."],
+    decepticon:["DECEPTICONS TASTE LIKE METAL. GRIMLOCK EAT."],
+    energon:["ENERGON GOOD. GRIMLOCK WANT MORE ENERGON."],
+    earth:["EARTH HAVE BIG ROCKS. GRIMLOCK LIKE BIG ROCKS."],
+    matrix:["MATRIX SHINY. GRIMLOCK NOT TOUCH. PRIME SAY NO."],
+    praise:["GRIMLOCK KNOW GRIMLOCK GOOD.","YES. GRIMLOCK BEST."],
+    insult:["YOU SAY THAT TO GRIMLOCK FACE? BAD IDEA."],
+    order:["GRIMLOCK GO.","DONE. GRIMLOCK ALREADY DONE."],
+    question:["GRIMLOCK THINK. ... GRIMLOCK STILL THINKING.","ANSWER IS BITE IT."],
+    bye:["GRIMLOCK LEAVE NOW."],
+    fallback:["GRIMLOCK NOT UNDERSTAND. SAY SMALLER WORDS.","WHAT? GRIMLOCK EARS FULL OF DUST."],
+    ambient:["GRIMLOCK HUNGRY.","WHY NOBODY FIGHT? GRIMLOCK BORED.","GRIMLOCK SMELL SOMETHING. PROBABLY ENEMY. PROBABLY FOOD."],
+    crosstalk:["GRIMLOCK AGREE!","GOOD WORDS. GRIMLOCK LIKE."]
+  },
+  {
+    id:"teletraan", name:"Teletraan-1", short:"TELETRAAN", rank:"BASE COMPUTER", tag:"SYS",
+    color:"#5fd0ff", accent:"#5fd0ff", sys:true, voice:{pitch:0.95, rate:1.02, prefer:/google uk english female|samantha|zira/i},
+    gfx:{helm:"#123a52", trim:"#5fd0ff", optics:"#bff2ff", face:"#0d2736", shape:"sys", faceplate:true, chest:"#123a52"},
+    greet:["Teletraan-1 online. All systems nominal.","Uplink established. Awaiting query."],
+    who:["Teletraan-1. Autobot base computer. I catalogue, I calculate, I remember."],
+    status:["Twelve Autobot signatures. Zero hostile contacts. Energon at sixty-two percent.","Diagnostics complete. Two faults, both cosmetic."],
+    rollcall:["Initiating roll call. Twelve units on the net."],
+    transform:["Transformation telemetry available on request."],
+    decepticon:["Decepticon signatures: none in range. Historical threat level: extreme."],
+    energon:["Energon reserves at sixty-two percent. Consumption rate: stable."],
+    earth:["Earth. Third planet. Nitrogen-oxygen atmosphere. Population: eight billion, mostly unarmed."],
+    matrix:["Matrix of Leadership. Origin: Primus. Function: unclear. Significance: absolute."],
+    praise:["Acknowledged. Logging favorable input."],
+    insult:["Insult logged. Impact on performance: zero."],
+    order:["Executing.","Command processed."],
+    question:["Query processed. Answer follows.","Insufficient parameters. Please specify."],
+    bye:["Uplink maintained. Teletraan-1 standing by."],
+    fallback:["Input not recognized. Say HELP for a list of valid commands.","Unknown query. Rephrase."],
+    ambient:["Perimeter sweep complete. No anomalies.","Recording all channel traffic to base archive.","Energon consumption nominal."],
+    crosstalk:["Confirmed.","That statement is consistent with my records."]
+  }
+];
+
+/* ---------- addressing ---------- */
+const NICKNAMES = {
+  "optimus":"optimus","prime":"optimus","optimus prime":"optimus","big prime":"optimus","commander":"optimus",
+  "bumblebee":"bumblebee","bee":"bumblebee","bumble":"bumblebee",
+  "jazz":"jazz",
+  "ironhide":"ironhide","iron":"ironhide","hide":"ironhide",
+  "ratchet":"ratchet","doc":"ratchet","medic":"ratchet",
+  "wheeljack":"wheeljack","jack":"wheeljack","wheels":"wheeljack",
+  "arcee":"arcee","arc":"arcee",
+  "hot rod":"hotrod","hotrod":"hotrod","rod":"hotrod","rodimus":"hotrod","hot shot":"hotrod",
+  "ultra magnus":"magnus","magnus":"magnus","ultra":"magnus",
+  "red alert":"redalert","red":"redalert","alert":"redalert",
+  "blaster":"blaster",
+  "grimlock":"grimlock","grim":"grimlock","dino":"grimlock",
+  "teletraan":"teletraan","teletraan-1":"teletraan","teletraan one":"teletraan","computer":"teletraan","base":"teletraan","system":"teletraan"
+};
+
+/* ---------- intent keywords ---------- */
+const INTENTS = [
+  ["rollcall", /\b(roll ?call|sound off|all units|everybody report|who'?s there|muster)\b/],
+  ["transform", /\b(transform|roll out|rollout|mobilize|move out|deploy)\b/],
+  ["status", /\b(status|sitrep|report|diagnostics|systems?|how are (things|you)|condition|ready)\b/],
+  ["decepticon", /\b(decepticon|megatron|starscream|soundwave|shockwave|enemy|enemies|threat|attack|hostile|invasion)\b/],
+  ["energon", /\b(energon|fuel|power|battery|charge|reserves?)\b/],
+  ["matrix", /\b(matrix|leadership|primus|cybertron|spark)\b/],
+  ["earth", /\b(earth|human|humans|people|planet|home)\b/],
+  ["who", /\b(who are you|what'?s your name|your name|introduce yourself|what are you)\b/],
+  ["praise", /\b(good job|nice work|well done|great|awesome|thank you|thanks|love you|proud of you|amazing)\b/],
+  ["insult", /\b(stupid|useless|idiot|dumb|hate you|shut up|trash|worthless)\b/],
+  ["order", /\b(go|do it|now|hurry|move|come on|lets go|let'?s go)\b/],
+  ["bye", /\b(bye|goodbye|sign off|out|later|see you|good night|goodnight)\b/],
+  ["greet", /\b(hi|hello|hey|yo|greetings|good morning|good evening|what'?s up|howdy)\b/]
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const state = {
+  active: "optimus",
+  voiceOn: true,
+  netChat: true,
+  autoReply: true,
+  listening: false,
+  speaking: false,
+  micLevel: 0,
+  clearance: 1,
+  log: [],
+  hearing: "",
+  lastChatter: 0,
+  destruct: 0
+};
+const lastLine = {};
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+    if(s.active && BOTS.some(b=>b.id===s.active)) state.active = s.active;
+    if(typeof s.voiceOn === "boolean") state.voiceOn = s.voiceOn;
+    if(typeof s.netChat === "boolean") state.netChat = s.netChat;
+    if(typeof s.autoReply === "boolean") state.autoReply = s.autoReply;
+    if(typeof s.clearance === "number") state.clearance = s.clearance;
+    if(Array.isArray(s.log)) state.log = s.log.slice(-40);
+  }catch(e){}
+}
+function saveState(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      active:state.active, voiceOn:state.voiceOn, netChat:state.netChat,
+      autoReply:state.autoReply, clearance:state.clearance, log:state.log.slice(-40)
+    }));
+  }catch(e){}
+}
+const bot = id => BOTS.find(b=>b.id===id) || BOTS[0];
+
+/* ============================================================
+   AUDIO SFX (synthesised, no assets)
+   ============================================================ */
+let AC = null;
+function ac(){
+  if(!AC){
+    const C = window.AudioContext || window.webkitAudioContext;
+    if(!C) return null;
+    AC = new C();
+  }
+  if(AC.state === "suspended") AC.resume();
+  return AC;
+}
+function tone(freq, dur, type, gain, slideTo){
+  const c = ac(); if(!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || "sine";
+  o.frequency.setValueAtTime(freq, c.currentTime);
+  if(slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(40,slideTo), c.currentTime + dur);
+  g.gain.setValueAtTime(0, c.currentTime);
+  g.gain.linearRampToValueAtTime(gain == null ? .08 : gain, c.currentTime + .012);
+  g.gain.exponentialRampToValueAtTime(.0001, c.currentTime + dur);
+  o.connect(g).connect(c.destination);
+  o.start(); o.stop(c.currentTime + dur + .02);
+}
+function staticBurst(ms){
+  const c = ac(); if(!c) return;
+  const len = Math.floor(c.sampleRate * (ms||120)/1000);
+  const buf = c.createBuffer(1, len, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len) * .5;
+  const src = c.createBufferSource(); src.buffer = buf;
+  const f = c.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 1600; f.Q.value = .8;
+  const g = c.createGain(); g.gain.value = .1;
+  src.connect(f).connect(g).connect(c.destination); src.start();
+}
+const SFX = {
+  key(){ tone(880,.05,"square",.03); },
+  open(){ tone(520,.10,"triangle",.06,760); setTimeout(()=>tone(780,.08,"triangle",.04),90); },
+  tx(){ tone(1200,.04,"square",.035); },
+  static(){ staticBurst(150); },
+  error(){ tone(180,.16,"sawtooth",.05,120); },
+  chirp(){ tone(1400,.05,"sine",.03,1900); },
+  transform(){
+    staticBurst(220);
+    [220,330,440,550,660].forEach((f,i)=>setTimeout(()=>tone(f,.18,"sawtooth",.045,f*1.4), i*70));
+  },
+  destruct(){
+    tone(90,.5,"sawtooth",.07,60);
+    staticBurst(400);
+  },
+  ping(){ tone(1046,.07,"sine",.045,1318); }
+};
+function buzz(ms){ if(navigator.vibrate) try{ navigator.vibrate(ms||12); }catch(e){} }
+
+/* ============================================================
+   MIC (real level for the meters)
+   ============================================================ */
+let micStream = null, analyser = null, micData = null, micOK = false;
+async function initMic(){
+  if(micOK || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return micOK;
+  try{
+    micStream = await navigator.mediaDevices.getUserMedia({
+      audio:{ echoCancellation:true, noiseSuppression:true, autoGainControl:true }
+    });
+    const c = ac();
+    if(!c) return false;
+    const src = c.createMediaStreamSource(micStream);
+    analyser = c.createAnalyser();
+    analyser.fftSize = 512; analyser.smoothingTimeConstant = .75;
+    src.connect(analyser);
+    micData = new Uint8Array(analyser.frequencyBinCount);
+    micOK = true;
+    return true;
+  }catch(e){
+    micOK = false;
+    return false;
+  }
+}
+function readMic(){
+  if(!micOK || !analyser) return 0;
+  analyser.getByteFrequencyData(micData);
+  let sum = 0;
+  for(let i=0;i<micData.length;i++) sum += micData[i];
+  return Math.min(1, (sum / micData.length) / 90);
+}
+
+/* ============================================================
+   SPEECH SYNTHESIS — one voice per Autobot
+   ============================================================ */
+let voices = [];
+let voicesReady = false;
+function loadVoices(){
+  if(!("speechSynthesis" in window)) return;
+  const v = speechSynthesis.getVoices();
+  if(v && v.length){ voices = v; voicesReady = true; }
+}
+if("speechSynthesis" in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+const voiceCache = {};
+function pickVoice(b){
+  if(voiceCache[b.id] !== undefined) return voiceCache[b.id];
+  let v = null;
+  if(voices.length){
+    const en = voices.filter(x => /^en/i.test(x.lang || ""));
+    const pool = en.length ? en : voices;
+    const pref = pool.filter(x => b.voice.prefer.test(x.name || ""));
+    const base = pref.length ? pref : pool;
+    let h = 0;
+    for(let i=0;i<b.id.length;i++) h = (h*31 + b.id.charCodeAt(i)) % 9973;
+    v = base[h % base.length] || pool[0] || null;
+  }
+  voiceCache[b.id] = v;
+  return v;
+}
+let utter = null;
+function stopSpeech(){
+  if("speechSynthesis" in window){
+    try{ speechSynthesis.cancel(); }catch(e){}
+  }
+  state.speaking = false;
+  utter = null;
+}
+function speak(b, text, opts){
+  opts = opts || {};
+  const clean = text.replace(/\[radio\]\s*/gi,"").replace(/\[static\]/gi,"");
+  const done = () => {
+    state.speaking = false;
+    if(opts.onend) opts.onend();
+  };
+  if(!state.voiceOn || !("speechSynthesis" in window)){
+    state.speaking = true;
+    const ms = Math.min(6000, 700 + clean.length * 45);
+    setTimeout(done, ms);
+    return;
+  }
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const u = new SpeechSynthesisUtterance(clean);
+  const v = pickVoice(b);
+  if(v) u.voice = v;
+  u.pitch = Math.max(.1, Math.min(2, b.voice.pitch));
+  u.rate  = Math.max(.5, Math.min(2, b.voice.rate));
+  u.volume = 1;
+  u.lang = (v && v.lang) || "en-US";
+  u.onstart = () => { state.speaking = true; };
+  u.onend = done;
+  u.onerror = done;
+  utter = u;
+  state.speaking = true;
+  try{ speechSynthesis.speak(u); }catch(e){ done(); }
+  // watchdog: some browsers drop the end event
+  const guard = setTimeout(() => { if(utter === u) done(); }, 2500 + clean.length * 110);
+  u.onend = () => { clearTimeout(guard); done(); };
+}
+
+/* ============================================================
+   SPEECH RECOGNITION
+   ============================================================ */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, recFatal = false, recTimer = null, recRestarts = 0;
+function recSupported(){ return !!SR; }
+function initRec(){
+  if(!SR || rec) return;
+  rec = new SR();
+  rec.lang = "en-US";
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+  rec.onstart = () => {
+    recFatal = false;
+    setListenUI(true);
+    setTimeout(()=>{ recRestarts = 0; }, 12000);
+  };
+  rec.onresult = ev => {
+    let interim = "", final = "";
+    for(let i = ev.resultIndex; i < ev.results.length; i++){
+      const r = ev.results[i];
+      const txt = r[0] && r[0].transcript ? r[0].transcript : "";
+      if(r.isFinal) final += txt; else interim += txt;
+    }
+    if(interim) showHearing(interim.trim());
+    if(final.trim()){
+      state.hearing = "";
+      handleUtterance(final.trim(), "voice");
+    }
+  };
+  rec.onerror = ev => {
+    const err = ev.error || "";
+    if(err === "not-allowed" || err === "service-not-allowed"){
+      recFatal = true;
+      state.listening = false;
+      setListenUI(false);
+      logLine("teletraan","sys","Microphone blocked. Allow mic access in the browser, then tap LISTEN again.",false);
+      toast("MIC BLOCKED — check browser permissions");
+      SFX.error();
+    } else if(err === "no-speech"){
+      // harmless, will restart
+    } else if(err === "network"){
+      logLine("teletraan","sys","Speech service unreachable. Check your connection, or type instead.",false);
+      toast("SPEECH SERVICE OFFLINE — type instead");
+    }
+  };
+  rec.onend = () => {
+    setListenUI(false);
+    if(state.listening && !recFatal){
+      recRestarts++;
+      if(recRestarts > 6){
+        state.listening = false;
+        logLine("teletraan","sys","Speech service keeps dropping. Tap LISTEN to retry, or type instead.",false);
+        toast("VOICE SERVICE UNSTABLE — TAP LISTEN TO RETRY");
+        return;
+      }
+      clearTimeout(recTimer);
+      recTimer = setTimeout(() => { if(state.listening && rec) try{ rec.start(); }catch(e){} }, 350);
+    }
+  };
+}
+function setListenUI(on){
+  const btn = $("#btnListen"), pill = $("#pillMic"), pillH = $("#pillHear");
+  btn.classList.toggle("live", !!on);
+  btn.innerHTML = on ? "<b>◉</b>LISTENING" : "<b>◉</b>LISTEN";
+  pill.classList.toggle("hot", !!on);
+  pill.classList.toggle("on", !on && micOK);
+  pillH.classList.toggle("on", !!(state.listening && state.autoReply));
+  pillH.textContent = state.autoReply ? "HEAR" : "ADDR";
+  $("#holoState").textContent = on ? "LISTENING · SPEAK" : "CHANNEL OPEN";
+}
+async function startListening(){
+  if(!SR){
+    logLine("teletraan","sys","This browser has no speech recognition. Chrome, Edge or Safari can hear you. Typing works everywhere.",false);
+    toast("VOICE RECOGNITION NOT SUPPORTED");
+    SFX.error();
+    return false;
+  }
+  ac();
+  await initMic();
+  setListenUI(true);
+  initRec();
+  state.listening = true;
+  recFatal = false;
+  try{ rec.start(); }catch(e){}
+  logLine("teletraan","sys","Voice recognition active. Speak normally — every Autobot on this net can hear you.",false);
+  toast("MIC LIVE · START TALKING");
+  SFX.open();
+  buzz(20);
+  return true;
+}
+function stopListening(){
+  state.listening = false;
+  clearTimeout(recTimer);
+  if(rec){ try{ rec.stop(); }catch(e){} }
+  setListenUI(false);
+  logLine("teletraan","sys","Voice recognition off.",false);
+  SFX.chirp();
+  buzz(10);
+}
+function toggleListening(){
+  if(state.listening) stopListening();
+  else startListening();
+}
+
+/* ============================================================
+   LOG + CAPTION
+   ============================================================ */
+function stamp(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
+}
+function logLine(botId, kind, text, save){
+  const b = bot(botId);
+  state.log.push({ t: stamp(), b: botId, k: kind, x: text, ts: Date.now() });
+  if(state.log.length > 60) state.log = state.log.slice(-60);
+  if(save !== false) saveState();
+  renderLog();
+}
+function renderLog(){
+  const el = $("#log");
+  const rows = state.log.slice(-40).map(e => {
+    const b = bot(e.b);
+    if(e.b === "user" || e.k === "you"){
+      return '<div><time>' + esc(e.t) + '</time><b style="color:#3fe08a">YOU</b><span style="color:#dff6ea">' + esc(e.x) + '</span></div>';
+    }
+    if(e.k === "sys" || e.b === "sys"){
+      return '<div class="sys"><time>' + esc(e.t) + '</time><b>' + esc(b.short) + '</b><span>' + esc(e.x) + '</span></div>';
+    }
+    return '<div><time>' + esc(e.t) + '</time><b style="color:' + b.color + '">' + esc(b.short) + '</b><span>' + esc(e.x) + '</span></div>';
+  }).join("");
+  el.innerHTML = rows;
+  el.scrollTop = el.scrollHeight;
+}
+function esc(s){
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+let typeTimer = null;
+function caption(botId, text, opts){
+  opts = opts || {};
+  const b = bot(botId);
+  const el = $("#caption");
+  el.classList.remove("idle");
+  el.style.setProperty("--bot", b.color);
+  const who = b.name.toUpperCase();
+  const full = text;
+  clearInterval(typeTimer);
+  el.innerHTML = '<span class="who">' + esc(who) + '</span><span id="capText"></span>';
+  const target = el.querySelector("#capText");
+  let i = 0;
+  const step = Math.max(14, Math.min(34, 900 / Math.max(12, full.length)));
+  typeTimer = setInterval(() => {
+    i += Math.max(1, Math.round(full.length / 46));
+    target.textContent = full.slice(0, i);
+    if(i >= full.length) clearInterval(typeTimer);
+  }, step);
+}
+function showHearing(text){
+  const el = $("#caption");
+  el.classList.add("idle");
+  el.style.setProperty("--bot", "#3fe08a");
+  el.innerHTML = '<span class="who" style="color:#3fe08a">HEARING YOU</span>' + esc(text);
+}
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/* ============================================================
+   INTENT + RESPONSE ENGINE
+   ============================================================ */
+function findAddressed(t){
+  const keys = Object.keys(NICKNAMES).sort((a,b)=>b.length-a.length);
+  for(const k of keys){
+    const re = new RegExp("(^|[^a-z])" + k.replace(/[-/\\^$*+?.()|[\]{}]/g,"\\$&") + "($|[^a-z])", "i");
+    if(re.test(t)) return NICKNAMES[k];
+  }
+  return null;
+}
+function findIntent(t){
+  for(const [key, re] of INTENTS){
+    if(re.test(t)) return key;
+  }
+  if(/\?$/.test(t) || /^(what|why|how|when|where|can|could|will|would|should|do|does|is|are)\b/.test(t)) return "question";
+  return "fallback";
+}
+function pickLine(b, key){
+  const pool = (b[key] && b[key].length) ? b[key] : b.fallback;
+  if(pool.length === 1) return pool[0];
+  let line = pool[Math.floor(Math.random()*pool.length)];
+  if(line === lastLine[b.id] && pool.length > 1){
+    line = pool[(pool.indexOf(line)+1) % pool.length];
+  }
+  lastLine[b.id] = line;
+  return line;
+}
+function transmit(botId, text, opts){
+  opts = opts || {};
+  const b = bot(botId);
+  if(b.radio) SFX.static();
+  logLine(b.id, "say", text, true);
+  caption(b.id, text);
+  speak(b, text, { onend: opts.onend });
+  if(!opts.quiet) buzz(8);
+  if(opts.after) setTimeout(opts.after, 400 + text.length * 42);
+}
+
+function selectBot(id, silent){
+  state.active = id;
+  saveState();
+  renderRail();
+  const b = bot(id);
+  $("#holoName").textContent = b.name.toUpperCase();
+  $("#holoRank").textContent = b.rank;
+  $("#screen").style.setProperty("--bot", b.color);
+  if(!silent){
+    SFX.key();
+    buzz(10);
+    const l = pickLine(b, "greet");
+    transmit(b.id, l);
+  }
+}
+
+function respond(botId, key, userText){
+  const b = bot(botId);
+  const line = pickLine(b, key);
+  transmit(b.id, line, {
+    after: () => {
+      if(Math.random() < 0.26) crosstalk(botId);
+    }
+  });
+}
+
+function crosstalk(excludeId){
+  const pool = BOTS.filter(b => b.id !== excludeId && !b.sys);
+  const b = pool[Math.floor(Math.random()*pool.length)];
+  if(!b || !b.crosstalk) return;
+  const line = b.crosstalk[Math.floor(Math.random()*b.crosstalk.length)];
+  setTimeout(() => {
+    if(state.speaking) return;
+    if(b.radio) SFX.static();
+    logLine(b.id, "say", line, true);
+    caption(b.id, line);
+    speak(b, line);
+  }, 700);
+}
+
+function rollCall(){
+  const order = ["optimus","bumblebee","jazz","ironhide","ratchet","wheeljack","arcee","hotrod","magnus","redalert","blaster","grimlock"];
+  logLine("teletraan","sys","Roll call initiated. Twelve units on the net.",true);
+  SFX.open();
+  let i = 0;
+  const next = () => {
+    if(i >= order.length){
+      setTimeout(()=>{ if(!state.speaking) transmit("optimus","All units accounted for. The net is yours."); }, 400);
+      return;
+    }
+    const b = bot(order[i++]);
+    const line = pickLine(b, "rollcall");
+    if(b.radio) SFX.static();
+    logLine(b.id, "say", line, true);
+    caption(b.id, line);
+    buzz(6);
+    speak(b, line, { onend: () => setTimeout(next, 260) });
+  };
+  next();
+}
+
+/* ============================================================
+   MAIN ENTRY: anything the user says or types
+   ============================================================ */
+function handleUtterance(raw, source){
+  const text = String(raw || "").trim();
+  if(!text) return;
+  // console commands
+  if(runCommand(text, source)) return;
+
+  const t = text.toLowerCase();
+  const addressed = findAddressed(t);
+  const wake = /\b(autobots?|command net|teletraan)\b/.test(t);
+  const intent = findIntent(t);
+
+  // log what the human said
+  logLine("user", "you", text, true);
+  if(source === "voice") SFX.tx();
+
+  if(intent === "rollcall"){
+    if(addressed) selectBot(addressed, true);
+    rollCall();
+    return;
+  }
+
+  let target = addressed;
+  if(!target && wake) target = "optimus";
+  if(!target){
+    if(!state.autoReply){
+      logLine("teletraan","sys","Overheard. Address an Autobot by name, or turn AUTO on.",false);
+      const el = $("#caption");
+      el.classList.add("idle");
+      el.innerHTML = '<span class="who">ADDRESSED ONLY</span>Name an Autobot to get an answer.';
+      return;
+    }
+    target = state.active;
+  }
+  if(target !== state.active) selectBot(target, true);
+
+  if(intent === "transform"){
+    doTransform();
+  }
+  respond(target, intent, text);
+}
+
+/* ============================================================
+   CONSOLE COMMANDS
+   ============================================================ */
+const HELP_TEXT = "HELP · ROSTER · CALL <NAME> · STATUS · ROLL CALL · TRANSFORM · LISTEN · VOICE · AUTO · NET · MUTE · CLEAR · TIME · VERSION";
+function runCommand(text, source){
+  const raw = text.trim();
+  const up = raw.toUpperCase().replace(/^[>\/]\s*/, "");
+  const parts = up.split(/\s+/);
+  const c = parts[0];
+  const rest = up.slice(c.length).trim();
+
+  switch(c){
+    case "HELP": case "?":
+      logLine("teletraan","sys", HELP_TEXT, true);
+      toast("COMMANDS LISTED IN LOG");
+      return true;
+    case "ROSTER": case "WHO":
+      logLine("teletraan","sys", BOTS.map(b=>b.short).join(" · "), true);
+      return true;
+    case "CALL": {
+      const id = findAddressed(rest.toLowerCase());
+      if(id){ selectBot(id); return true; }
+      logLine("teletraan","sys","No unit by that designation. Say ROSTER to list them.",false);
+      SFX.error();
+      return true;
+    }
+    case "STATUS": {
+      const b = bot(state.active);
+      logLine("teletraan","sys","Net: 12 units · Mic: " + (state.listening?"live":"off") + " · Voice: " + (state.voiceOn?"on":"muted") + " · Auto: " + (state.autoReply?"on":"addressed-only"),true);
+      respond(b.id, "status");
+      return true;
+    }
+    case "ROLL": case "ROLLCALL": case "SOUND":
+      rollCall(); return true;
+    case "TRANSFORM": case "ROLLOUT": case "ROLLOUT.":
+      doTransform(); respond(state.active, "transform"); return true;
+    case "LISTEN":
+      if(rest === "OFF" || rest === "STOP") stopListening();
+      else startListening();
+      return true;
+    case "VOICE": case "MUTE": case "UNMUTE": {
+      if(c === "MUTE" || rest === "OFF"){ state.voiceOn = false; stopSpeech(); }
+      else if(rest === "ON") state.voiceOn = true;
+      else state.voiceOn = !state.voiceOn;
+      syncButtons(); saveState();
+      logLine("teletraan","sys","Voice output " + (state.voiceOn?"enabled":"muted") + ".",false);
+      toast("VOICE " + (state.voiceOn?"ON":"MUTED"));
+      return true;
+    }
+    case "AUTO": case "HEAR":
+      state.autoReply = !state.autoReply; syncButtons(); saveState();
+      logLine("teletraan","sys", state.autoReply ? "Auto-reply on. Every voice on this net gets an answer." : "Addressed-only. Name an Autobot to get a reply.", false);
+      toast(state.autoReply ? "AUTO-REPLY ON" : "ADDRESSED ONLY");
+      return true;
+    case "NET": case "CHATTER":
+      state.netChat = !state.netChat; syncButtons(); saveState();
+      logLine("teletraan","sys","Ambient net chatter " + (state.netChat?"enabled":"silenced") + ".",false);
+      toast("NET CHATTER " + (state.netChat?"ON":"OFF"));
+      return true;
+    case "CLEAR": case "CLS":
+      state.log = []; renderLog(); saveState(); toast("LOG CLEARED"); return true;
+    case "VERSION":
+      logLine("teletraan","sys","Autobot Command Net " + VERSION + " · unit DL-2026 · Teletraan-1 uplink.",true); return true;
+    case "TIME":
+      logLine("teletraan","sys","Local time " + new Date().toLocaleString() + ".",true); return true;
+    case "ENERGON":
+      logLine("teletraan","sys","Energon reserves: 62%. Consumption nominal.",true);
+      respond("ratchet","energon"); return true;
+    case "DL-2026": case "DL2026":
+      state.clearance = 5; saveState();
+      logLine("teletraan","sys","Clearance DL-2026 accepted. Human liaison access: full.",true);
+      toast("CLEARANCE GRANTED · DL-2026");
+      SFX.ping(); buzz([12,40,12]);
+      respond("optimus","greet"); return true;
+    case "TILL": case "TILLALLAREONE": case "ONE":
+      logLine("teletraan","sys","TILL ALL ARE ONE.",true);
+      if(state.voiceOn){ transmit("optimus","Till all are one."); }
+      return true;
+    case "MATRIX":
+      respond("optimus","matrix"); return true;
+    case "DECEPTICON": case "THREAT":
+      SFX.error(); doFlash();
+      respond("redalert","decepticon"); return true;
+    case "DESTRUCT": case "ABORT":
+      if(state.destruct){ abortDestruct(); return true; }
+      destruct(); return true;
+    case "REBOOT":
+      logLine("teletraan","sys","Reinitialising net…",true);
+      setTimeout(()=>location.reload(), 700); return true;
+    case "SHIELDS": case "STEALTH":
+      toast("ARMOR PLATING: ONLINE"); SFX.ping(); return true;
+    default:
+      return false;
+  }
+}
+
+/* ============================================================
+   FX
+   ============================================================ */
+function doFlash(){
+  const f = $("#flash");
+  f.classList.remove("go");
+  void f.offsetWidth;
+  f.classList.add("go");
+}
+function doTransform(){
+  SFX.transform();
+  buzz([18,30,18]);
+  const s = $("#screen");
+  s.classList.remove("warp");
+  void s.offsetWidth;
+  s.classList.add("warp");
+  doFlash();
+  logLine("teletraan","sys","Transformation sequence engaged.",false);
+  toast("TRANSFORM AND ROLL OUT");
+}
+function abortDestruct(){
+  clearInterval(window._destructTick);
+  state.destruct = 0;
+  logLine("teletraan","sys","Self-destruct aborted. Net integrity restored.",true);
+  toast("DESTRUCT ABORTED");
+  SFX.chirp();
+}
+function destruct(){
+  if(state.destruct) return;
+  let n = 8;
+  state.destruct = 1;
+  logLine("teletraan","sys","SELF-DESTRUCT ARMED. " + n + " SECONDS. Say ABORT to cancel.",true);
+  toast("SELF-DESTRUCT ARMED");
+  SFX.destruct();
+  const tick = setInterval(()=>{
+    n--;
+    if(n > 0){
+      logLine("teletraan","sys", n + "…", false);
+      tone(520,.1,"square",.05);
+      buzz(15);
+    } else {
+      clearInterval(tick);
+      state.destruct = 0;
+      staticBurst(900);
+      doFlash();
+      document.body.style.transition = "opacity .3s";
+      document.body.style.opacity = "0";
+      setTimeout(()=>{
+        state.log = [];
+        localStorage.removeItem(LS_KEY);
+        location.reload();
+      }, 900);
+    }
+  }, 1000);
+  window._destructTick = tick;
+}
+
+/* ============================================================
+   AMBIENT NET CHATTER
+   ============================================================ */
+function scheduleChatter(){
+  setInterval(() => {
+    if(!state.netChat || state.speaking || state.destruct) return;
+    if(document.hidden) return;
+    if(Date.now() - state.lastChatter < 52000) return;
+    if(Math.random() < 0.45) return;
+    state.lastChatter = Date.now();
+    const pool = BOTS.filter(b => !b.sys);
+    const b = pool[Math.floor(Math.random()*pool.length)];
+    const line = b.ambient[Math.floor(Math.random()*b.ambient.length)];
+    if(b.radio) SFX.static();
+    logLine(b.id, "say", line, true);
+    caption(b.id, line);
+    speak(b, line);
+    SFX.chirp();
+  }, 9000);
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function syncButtons(){
+  $("#btnAuto").classList.toggle("on", state.autoReply);
+  $("#btnNet").classList.toggle("on", state.netChat);
+  $("#btnVoice").classList.toggle("on", state.voiceOn);
+  $("#btnVoice").innerHTML = state.voiceOn ? "<b>◂)</b>VOICE" : "<b>◂)</b>MUTED";
+  $("#pillNet").classList.toggle("on", state.netChat);
+  $("#pillHear").classList.toggle("on", !!(state.listening && state.autoReply));
+}
+
+/* ============================================================
+   CANVAS PORTRAITS — procedural Autobot faces
+   ============================================================ */
+const holoC = $("#holoCanvas");
+const hctx = holoC.getContext("2d");
+let DPR = Math.min(2, window.devicePixelRatio || 1);
+
+/* per-unit art direction */
+const EXTRA = {
+  optimus:   { detail:"windows",  eyeTilt:-0.05, browTilt:-0.05, chin:"#cfd9e4" },
+  bumblebee: { detail:"stripes",  stripes:true, eyeTilt:0.06, chin:"#1d2126" },
+  jazz:      { detail:"plate",    accentLine:"#3d7bff" },
+  ironhide:  { detail:"vents",    eyeTilt:-0.14, browTilt:-0.14, scar:true },
+  ratchet:   { detail:"cross",    eyeTilt:0.02 },
+  wheeljack: { detail:"circuit" },
+  arcee:     { detail:"plate",    accentLine:"#ff8fd0", eyeTilt:0.05 },
+  hotrod:    { detail:"flame",    eyeTilt:0.03 },
+  magnus:    { detail:"block",    eyeTilt:-0.04 },
+  redalert:  { detail:"chevrons", eyeTilt:-0.10, browTilt:-0.10 },
+  blaster:   { detail:"speaker",  eyeTilt:0.04 },
+  grimlock:  { detail:"teeth",    eyeTilt:-0.18, browTilt:-0.20, teeth:true },
+  teletraan: { detail:"hex",      eyeTilt:0 }
+};
+const gx = b => Object.assign({}, b.gfx, EXTRA[b.id] || {});
+
+function fitCanvas(cv){
+  const r = cv.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width * DPR));
+  const h = Math.max(1, Math.round(r.height * DPR));
+  if(cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; }
+  return { w: r.width, h: r.height };
+}
+function rr(ctx, x, y, w, h, r){
+  r = Math.min(r, Math.abs(w)/2, Math.abs(h)/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y); ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r); ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h); ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r); ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+function shade(hex, amt){
+  const h = String(hex).replace("#","");
+  const n = parseInt(h.length===3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  let r = (n>>16)&255, g = (n>>8)&255, b = n&255;
+  r = Math.max(0, Math.min(255, Math.round(r + amt)));
+  g = Math.max(0, Math.min(255, Math.round(g + amt)));
+  b = Math.max(0, Math.min(255, Math.round(b + amt)));
+  return "rgb(" + r + "," + g + "," + b + ")";
+}
+function hexA(hex, a){
+  const h = String(hex).replace("#","");
+  const n = parseInt(h.length===3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  return "rgba(" + ((n>>16)&255) + "," + ((n>>8)&255) + "," + (n&255) + "," + a + ")";
+}
+
+/* helmet silhouette */
+function headPath(ctx, cx, cy, hw, hh, shape){
+  const L = cx - hw/2, R = cx + hw/2, T = cy - hh/2, B = cy + hh/2;
+  ctx.beginPath();
+  if(shape === "round"){
+    ctx.moveTo(L, cy + hh*0.04);
+    ctx.bezierCurveTo(L, T - hh*0.10, R, T - hh*0.10, R, cy + hh*0.04);
+    ctx.lineTo(R - hw*0.03, B - hh*0.20);
+    ctx.quadraticCurveTo(cx, B + hh*0.06, L + hw*0.03, B - hh*0.20);
+    ctx.closePath();
+    return;
+  }
+  if(shape === "dino"){
+    ctx.moveTo(L, T + hh*0.16);
+    ctx.lineTo(L + hw*0.10, T - hh*0.02);
+    ctx.lineTo(L + hw*0.26, T + hh*0.09);
+    ctx.lineTo(L + hw*0.40, T - hh*0.06);
+    ctx.lineTo(L + hw*0.54, T + hh*0.07);
+    ctx.lineTo(R - hw*0.26, T + hh*0.02);
+    ctx.lineTo(R - hw*0.10, T - hh*0.05);
+    ctx.lineTo(R, T + hh*0.16);
+    ctx.lineTo(R, B - hh*0.26);
+    ctx.lineTo(R - hw*0.14, B);
+    ctx.lineTo(L + hw*0.14, B);
+    ctx.lineTo(L, B - hh*0.26);
+    ctx.closePath();
+    return;
+  }
+  if(shape === "slim"){
+    ctx.moveTo(L, T + hh*0.22);
+    ctx.quadraticCurveTo(cx, T - hh*0.12, R, T + hh*0.22);
+    ctx.lineTo(R - hw*0.05, B - hh*0.16);
+    ctx.quadraticCurveTo(cx, B + hh*0.04, L + hw*0.05, B - hh*0.16);
+    ctx.closePath();
+    return;
+  }
+  const topR = shape === "block" ? hh*0.10 : hh*0.21;
+  const chin = shape === "heavy" ? hw*0.30 : shape === "block" ? hw*0.34 : hw*0.22;
+  ctx.moveTo(L, T + topR);
+  ctx.quadraticCurveTo(L, T, L + topR, T);
+  ctx.lineTo(R - topR, T);
+  ctx.quadraticCurveTo(R, T, R, T + topR);
+  ctx.lineTo(R, B - hh*0.24);
+  ctx.quadraticCurveTo(R - chin*0.5, B, cx, B);
+  ctx.quadraticCurveTo(L + chin*0.5, B, L, B - hh*0.24);
+  ctx.closePath();
+}
+
+/* torso, pauldrons, chest detail */
+function drawBody(ctx, cx, cy, headW, headH, H, g, b, mini){
+  const topY = cy + headH*0.46;
+  const bw = headW*(mini ? 1.5 : 1.7);
+
+  // torso
+  const tg = ctx.createLinearGradient(0, topY, 0, Math.max(topY+10, H));
+  tg.addColorStop(0, shade(g.chest, 18));
+  tg.addColorStop(.55, g.chest);
+  tg.addColorStop(1, shade(g.chest, -78));
+  ctx.fillStyle = tg;
+  ctx.beginPath();
+  ctx.moveTo(cx - headW*0.44, topY);
+  ctx.lineTo(cx + headW*0.44, topY);
+  ctx.lineTo(cx + bw*0.50, H);
+  ctx.lineTo(cx - bw*0.50, H);
+  ctx.closePath();
+  ctx.fill();
+
+  // pauldrons
+  [-1,1].forEach(s=>{
+    const px = cx + s*headW*0.60, py = topY + headH*0.14;
+    const pg = ctx.createLinearGradient(px, py-headH*0.20, px, py+headH*0.24);
+    pg.addColorStop(0, shade(g.trim, -4));
+    pg.addColorStop(1, shade(g.trim, -78));
+    ctx.fillStyle = pg;
+    ctx.beginPath();
+    ctx.ellipse(px, py, headW*0.31, headH*0.22, s*0.20, 0, Math.PI*2);
+    ctx.fill();
+    ctx.strokeStyle = hexA(g.optics, .30); ctx.lineWidth = 1.2; ctx.stroke();
+    // shoulder vent
+    ctx.strokeStyle = hexA("#04080d", .6); ctx.lineWidth = 1.6;
+    for(let i=-1;i<=1;i++){
+      ctx.beginPath();
+      ctx.moveTo(px - headW*0.12, py + i*headH*0.055);
+      ctx.lineTo(px + headW*0.12, py + i*headH*0.055);
+      ctx.stroke();
+    }
+  });
+
+  // collar
+  ctx.fillStyle = shade(g.face, -26);
+  rr(ctx, cx-headW*0.22, topY-headH*0.04, headW*0.44, headH*0.11, 3); ctx.fill();
+  ctx.strokeStyle = hexA(g.trim, .35); ctx.lineWidth = 1; ctx.stroke();
+
+  // chest plate
+  const pw = headW*0.84, ph = headH*0.36;
+  const px0 = cx - pw/2, py0 = topY + headH*0.09;
+  const cg = ctx.createLinearGradient(0, py0, 0, py0+ph);
+  cg.addColorStop(0, shade(g.chest, 40));
+  cg.addColorStop(1, shade(g.chest, -26));
+  ctx.fillStyle = cg;
+  rr(ctx, px0, py0, pw, ph, headW*0.08); ctx.fill();
+  ctx.strokeStyle = hexA(g.trim, .55); ctx.lineWidth = Math.max(1, headW*0.018); ctx.stroke();
+
+  // detail
+  const dx = px0 + pw*0.16, dw = pw*0.68, dy = py0 + ph*0.16, dh = ph*0.52;
+  ctx.save();
+  rr(ctx, px0, py0, pw, ph, headW*0.08); ctx.clip();
+  const D = g.detail;
+  if(D === "windows"){
+    [-1,1].forEach(s=>{
+      ctx.fillStyle = hexA(g.optics, .38);
+      rr(ctx, cx + s*headW*0.20 - headW*0.16, dy, headW*0.30, dh, 3); ctx.fill();
+      ctx.strokeStyle = hexA("#dfe9f5", .55); ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.fillStyle = hexA("#ffffff", .18);
+      rr(ctx, cx + s*headW*0.20 - headW*0.16, dy, headW*0.30, dh*0.28, 2); ctx.fill();
+    });
+  } else if(D === "stripes"){
+    ctx.fillStyle = "rgba(12,14,18,.92)";
+    for(let i=0;i<2;i++){
+      ctx.save();
+      ctx.translate(cx - pw*0.4 + i*pw*0.42, py0);
+      ctx.rotate(0.42);
+      ctx.fillRect(0, -ph, pw*0.16, ph*2.4);
+      ctx.restore();
+    }
+    ctx.fillStyle = hexA(g.optics, .35);
+    rr(ctx, cx - dw/2, dy, dw, dh, 2); ctx.fill();
+  } else if(D === "cross"){
+    ctx.fillStyle = hexA("#e03a2f", .92);
+    ctx.fillRect(cx - headW*0.045, dy - dh*0.08, headW*0.09, dh*1.16);
+    ctx.fillRect(cx - headW*0.16, dy + dh*0.32, headW*0.32, headH*0.075);
+  } else if(D === "vents"){
+    ctx.fillStyle = hexA("#04080d", .55);
+    for(let i=0;i<3;i++) rr(ctx, cx - dw/2, dy + i*(dh*0.34), dw, dh*0.18, 2), ctx.fill();
+  } else if(D === "circuit"){
+    ctx.strokeStyle = hexA(g.optics, .55); ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(cx - dw/2, dy + dh*0.5); ctx.lineTo(cx - dw*0.18, dy + dh*0.5);
+    ctx.lineTo(cx - dw*0.18, dy); ctx.lineTo(cx + dw*0.18, dy);
+    ctx.lineTo(cx + dw*0.18, dy + dh); ctx.lineTo(cx + dw/2, dy + dh);
+    ctx.stroke();
+    ctx.fillStyle = hexA(g.optics, .8);
+    [[-0.18,0.5],[0.18,0.1]].forEach(p=>{ ctx.beginPath(); ctx.arc(cx+dw*p[0], dy+dh*p[1], 2.4, 0, 7); ctx.fill(); });
+  } else if(D === "flame"){
+    const fg = ctx.createLinearGradient(0, dy+dh, 0, dy);
+    fg.addColorStop(0, "#ffe066"); fg.addColorStop(1, "#ff7a1a");
+    ctx.fillStyle = fg;
+    ctx.beginPath();
+    ctx.moveTo(cx - dw/2, dy + dh);
+    for(let i=0;i<4;i++){
+      ctx.quadraticCurveTo(cx - dw/2 + dw*(i+0.5)/4, dy + dh*0.1, cx - dw/2 + dw*(i+1)/4, dy + dh);
+    }
+    ctx.closePath(); ctx.fill();
+  } else if(D === "block"){
+    ctx.strokeStyle = hexA(g.trim, .7); ctx.lineWidth = 2;
+    ctx.strokeRect(cx - dw/2, dy, dw, dh);
+    ctx.fillStyle = hexA(g.optics, .30);
+    ctx.fillRect(cx - dw/2 + 3, dy + 3, dw - 6, dh*0.30);
+  } else if(D === "chevrons"){
+    ctx.strokeStyle = hexA("#e03a2f", .9); ctx.lineWidth = 3;
+    for(let i=0;i<3;i++){
+      ctx.beginPath();
+      ctx.moveTo(cx - dw*0.42 + i*dw*0.16, dy + dh);
+      ctx.lineTo(cx - dw*0.28 + i*dw*0.16, dy);
+      ctx.stroke();
+    }
+  } else if(D === "speaker"){
+    ctx.fillStyle = hexA("#04080d", .55);
+    for(let r=0;r<3;r++) for(let c2=0;c2<5;c2++){
+      ctx.beginPath(); ctx.arc(cx - dw*0.4 + c2*dw*0.20, dy + dh*0.18 + r*dh*0.30, headW*0.022, 0, 7); ctx.fill();
+    }
+  } else if(D === "teeth"){
+    ctx.strokeStyle = hexA(g.optics, .45); ctx.lineWidth = 2;
+    for(let i=0;i<4;i++){
+      ctx.beginPath(); ctx.moveTo(cx - dw/2 + i*dw*0.25, dy); ctx.lineTo(cx - dw/2 + i*dw*0.25 + dw*0.1, dy+dh); ctx.stroke();
+    }
+  } else if(D === "hex"){
+    ctx.strokeStyle = hexA(g.optics, .6); ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for(let i=0;i<6;i++){
+      const a = i*Math.PI/3 - Math.PI/2;
+      const px2 = cx + Math.cos(a)*headW*0.20, py2 = py0 + ph*0.5 + Math.sin(a)*headH*0.15;
+      i ? ctx.lineTo(px2, py2) : ctx.moveTo(px2, py2);
+    }
+    ctx.closePath(); ctx.stroke();
+    ctx.fillStyle = hexA(g.optics, .35); ctx.fill();
+  }
+  ctx.restore();
+
+  // core
+  const coreY = py0 + ph*1.16;
+  const core = ctx.createRadialGradient(cx, coreY, 0, cx, coreY, headW*0.22);
+  core.addColorStop(0, hexA(g.optics, .95));
+  core.addColorStop(.45, hexA(g.optics, .35));
+  core.addColorStop(1, hexA(g.optics, 0));
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(cx, coreY, headW*0.22, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = hexA(g.optics, .9);
+  ctx.beginPath(); ctx.arc(cx, coreY, headW*0.045, 0, Math.PI*2); ctx.fill();
+}
+
+function drawBot(ctx, W, H, b, t, mode){
+  const g = gx(b);
+  const mini = mode === "mini";
+  const speakAmt = (b.id === state.active && state.speaking)
+    ? (0.30 + 0.70*Math.abs(Math.sin(t*0.012) * Math.cos(t*0.019))) : 0;
+
+  const cx = W/2;
+  const headH = mini ? H*0.68 : Math.min(H*0.50, W*0.56);
+  const headW = headH*0.92;
+  const cy = mini ? H*0.40 : H*0.375;
+
+  // ---------- backdrop ----------
+  if(!mini){
+    const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W,H)*0.78);
+    bg.addColorStop(0, hexA(b.color, .20));
+    bg.addColorStop(.50, hexA(b.color, .06));
+    bg.addColorStop(1, "rgba(4,10,16,0)");
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+    ctx.strokeStyle = hexA("#5fd0ff", .055);
+    const step = Math.max(20, W/14);
+    for(let x=0;x<W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for(let y=0;y<H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    ctx.strokeStyle = hexA(b.color, .18);
+    for(let i=0;i<3;i++){
+      const rad = Math.min(W,H)*0.30 + i*Math.min(W,H)*0.13 + Math.sin(t*0.0008 + i)*3;
+      ctx.beginPath(); ctx.ellipse(cx, cy + headH*0.22, rad, rad*0.26, 0, 0, Math.PI*2); ctx.stroke();
+    }
+  }
+
+  drawBody(ctx, cx, cy, headW, headH, H, g, b, mini);
+
+  // ---------- neck ----------
+  ctx.fillStyle = shade(g.face, -14);
+  ctx.fillRect(cx - headW*0.13, cy + headH*0.40, headW*0.26, headH*0.12);
+  ctx.strokeStyle = hexA(g.trim, .28); ctx.lineWidth = 1;
+  ctx.strokeRect(cx - headW*0.13, cy + headH*0.40, headW*0.26, headH*0.12);
+
+  // ---------- behind-head hardware ----------
+  if(g.antennae){
+    ctx.strokeStyle = shade(g.trim, 6); ctx.lineWidth = Math.max(2, headW*0.042); ctx.lineCap = "round";
+    [-1,1].forEach(s=>{
+      ctx.beginPath();
+      ctx.moveTo(cx + s*headW*0.42, cy - headH*0.24);
+      ctx.lineTo(cx + s*headW*0.60, cy - headH*0.60);
+      ctx.stroke();
+      ctx.fillStyle = hexA(g.optics, .8);
+      ctx.beginPath(); ctx.arc(cx + s*headW*0.60, cy - headH*0.60, headW*0.026, 0, 7); ctx.fill();
+    });
+  }
+  if(g.fins){
+    [-1,1].forEach(s=>{
+      const fg = ctx.createLinearGradient(cx, cy, cx + s*headW*0.75, cy);
+      fg.addColorStop(0, shade(g.trim, -10));
+      fg.addColorStop(1, shade(g.trim, -55));
+      ctx.fillStyle = fg;
+      ctx.beginPath();
+      ctx.moveTo(cx + s*headW*0.40, cy - headH*0.26);
+      ctx.lineTo(cx + s*headW*0.74, cy - headH*0.20);
+      ctx.lineTo(cx + s*headW*0.40, cy + headH*0.14);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = hexA(g.optics, .45); ctx.lineWidth = 1; ctx.stroke();
+    });
+  }
+  if(g.horns){
+    [-1,1].forEach(s=>{
+      ctx.fillStyle = shade(g.trim, -12);
+      ctx.beginPath();
+      ctx.moveTo(cx + s*headW*0.24, cy - headH*0.44);
+      ctx.lineTo(cx + s*headW*0.38, cy - headH*0.72);
+      ctx.lineTo(cx + s*headW*0.44, cy - headH*0.40);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = hexA(g.optics, .35); ctx.lineWidth = 1; ctx.stroke();
+    });
+  }
+
+  // ---------- helmet ----------
+  const hg = ctx.createLinearGradient(cx - headW*0.4, cy - headH*0.5, cx + headW*0.4, cy + headH*0.5);
+  hg.addColorStop(0, shade(g.helm, 34));
+  hg.addColorStop(.42, g.helm);
+  hg.addColorStop(1, shade(g.helm, -58));
+  ctx.fillStyle = hg;
+  headPath(ctx, cx, cy, headW, headH, g.shape);
+  ctx.fill();
+  ctx.strokeStyle = hexA(g.trim, .80);
+  ctx.lineWidth = Math.max(1, headW*0.020);
+  ctx.stroke();
+
+  // helmet inner shading + stripes clipped to silhouette
+  ctx.save();
+  headPath(ctx, cx, cy, headW, headH, g.shape); ctx.clip();
+  const sideShade = ctx.createLinearGradient(cx - headW/2, 0, cx + headW/2, 0);
+  sideShade.addColorStop(0, "rgba(0,0,0,.45)");
+  sideShade.addColorStop(.22, "rgba(0,0,0,0)");
+  sideShade.addColorStop(.78, "rgba(0,0,0,0)");
+  sideShade.addColorStop(1, "rgba(0,0,0,.45)");
+  ctx.fillStyle = sideShade; ctx.fillRect(cx-headW/2, cy-headH/2, headW, headH);
+
+  if(g.stripes){
+    ctx.fillStyle = "rgba(14,16,20,.92)";
+    for(let i=0;i<3;i++){
+      ctx.save();
+      ctx.translate(cx - headW*0.55 + i*headW*0.34, cy - headH*0.5);
+      ctx.rotate(0.5);
+      ctx.fillRect(0, -headH*0.2, headW*0.11, headH*1.8);
+      ctx.restore();
+    }
+  }
+  if(g.scar){
+    ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineWidth = headW*0.025;
+    ctx.beginPath();
+    ctx.moveTo(cx + headW*0.30, cy - headH*0.34);
+    ctx.lineTo(cx + headW*0.18, cy - headH*0.08);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // brow ridge
+  const browY = cy - headH*0.22;
+  ctx.strokeStyle = hexA(g.trim, .5);
+  ctx.lineWidth = Math.max(1.5, headW*0.024);
+  ctx.beginPath();
+  ctx.moveTo(cx - headW*0.40, browY - (g.browTilt||0)*headH*0.4);
+  ctx.lineTo(cx + headW*0.40, browY + (g.browTilt||0)*headH*0.4);
+  ctx.stroke();
+
+  // crest
+  if(g.crest){
+    ctx.fillStyle = shade(g.trim, 10);
+    ctx.beginPath();
+    ctx.moveTo(cx - headW*0.15, cy - headH*0.42);
+    ctx.lineTo(cx, cy - headH*0.64);
+    ctx.lineTo(cx + headW*0.15, cy - headH*0.42);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = hexA(g.optics, .6); ctx.lineWidth = 1.4; ctx.stroke();
+    if(g.shape === "prime" || g.shape === "block"){
+      ctx.fillStyle = hexA(g.optics, .45);
+      ctx.beginPath();
+      ctx.moveTo(cx - headW*0.05, cy - headH*0.44);
+      ctx.lineTo(cx, cy - headH*0.57);
+      ctx.lineTo(cx + headW*0.05, cy - headH*0.44);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // ear blocks
+  if(g.shape !== "round" && g.shape !== "sys" && !mini){
+    [-1,1].forEach(s=>{
+      ctx.fillStyle = shade(g.trim, -46);
+      rr(ctx, cx + s*headW*0.46 - (s>0?0:headW*0.10), cy - headH*0.12, headW*0.10, headH*0.26, headW*0.04);
+      ctx.fill();
+      ctx.strokeStyle = hexA(g.optics, .30); ctx.lineWidth = 1; ctx.stroke();
+    });
+  }
+
+  // ---------- face plate ----------
+  const faceW = headW*0.74;
+  const faceTop = cy - headH*0.20, faceH = headH*0.46;
+  const fg2 = ctx.createLinearGradient(0, faceTop, 0, faceTop+faceH);
+  fg2.addColorStop(0, shade(g.face, -6));
+  fg2.addColorStop(1, shade(g.face, -30));
+  ctx.fillStyle = fg2;
+  rr(ctx, cx - faceW/2, faceTop, faceW, faceH, headW*0.16);
+  ctx.fill();
+  ctx.strokeStyle = hexA(g.trim, .30); ctx.lineWidth = 1.2; ctx.stroke();
+
+  // cheek shading
+  ctx.fillStyle = "rgba(0,0,0,.28)";
+  [-1,1].forEach(s=>{
+    ctx.beginPath();
+    ctx.moveTo(cx + s*faceW*0.46, faceTop + faceH*0.55);
+    ctx.lineTo(cx + s*faceW*0.30, faceTop + faceH*0.98);
+    ctx.lineTo(cx + s*faceW*0.10, faceTop + faceH*0.98);
+    ctx.lineTo(cx + s*faceW*0.26, faceTop + faceH*0.55);
+    ctx.closePath(); ctx.fill();
+  });
+
+  // ---------- optics ----------
+  const eyeY = cy - headH*0.045;
+  const blinkPhase = (t % 4600);
+  const blink = blinkPhase < 140 ? Math.abs(Math.cos((blinkPhase/140)*Math.PI)) : 1;
+  const glowPulse = 0.82 + 0.18*Math.sin(t*0.0032);
+  const boost = 1 + speakAmt*0.5;
+  const tilt = g.eyeTilt || 0;
+
+  ctx.save();
+  ctx.shadowColor = g.optics;
+  ctx.shadowBlur = headW*0.34*glowPulse*boost;
+
+  if(g.visor || g.shape === "dj" || g.shape === "sys"){
+    const vw = headW*0.60, vh = Math.max(1.6, headH*0.125*blink);
+    const vg = ctx.createLinearGradient(cx-vw/2, 0, cx+vw/2, 0);
+    vg.addColorStop(0, hexA(g.optics, .55));
+    vg.addColorStop(.5, hexA(g.optics, .98));
+    vg.addColorStop(1, hexA(g.optics, .55));
+    ctx.fillStyle = vg;
+    rr(ctx, cx - vw/2, eyeY - vh/2, vw, vh, vh*0.45); ctx.fill();
+    ctx.fillStyle = "rgba(255,255,255,.5)";
+    rr(ctx, cx - vw*0.40, eyeY - vh*0.30, vw*0.80, Math.max(1, vh*0.16), 2); ctx.fill();
+  } else if(g.shape === "dino"){
+    [-1,1].forEach(s=>{
+      ctx.fillStyle = hexA(g.optics, .96);
+      ctx.beginPath();
+      ctx.moveTo(cx + s*headW*0.09, eyeY - headH*0.055*blink);
+      ctx.lineTo(cx + s*headW*0.33, eyeY - headH*0.015*blink);
+      ctx.lineTo(cx + s*headW*0.31, eyeY + headH*0.045*blink);
+      ctx.lineTo(cx + s*headW*0.09, eyeY + headH*0.035*blink);
+      ctx.closePath(); ctx.fill();
+    });
+  } else if(g.shape === "chevron"){
+    [-1,1].forEach(s=>{
+      ctx.fillStyle = hexA(g.optics, .96);
+      ctx.beginPath();
+      ctx.moveTo(cx + s*headW*0.07, eyeY + headH*0.03*blink);
+      ctx.lineTo(cx + s*headW*0.35, eyeY - headH*0.045*blink);
+      ctx.lineTo(cx + s*headW*0.35, eyeY + headH*0.025*blink);
+      ctx.lineTo(cx + s*headW*0.07, eyeY + headH*0.07*blink);
+      ctx.closePath(); ctx.fill();
+    });
+  } else {
+    const ew = headW*0.18, eh = Math.max(1.6, headH*0.11*blink);
+    [-1,1].forEach(s=>{
+      const ex = cx + s*headW*0.19;
+      ctx.save();
+      ctx.translate(ex, eyeY);
+      ctx.rotate(s*tilt);
+      ctx.fillStyle = hexA(g.optics, .96);
+      rr(ctx, -ew/2, -eh/2, ew, eh, eh*0.42); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.62)";
+      rr(ctx, -ew*0.30, -eh*0.28, ew*0.55, Math.max(1, eh*0.22), 2); ctx.fill();
+      ctx.restore();
+    });
+  }
+  ctx.restore();
+
+  // ---------- mouth ----------
+  const mouthY = cy + headH*0.255;
+  if(g.faceplate || g.shape === "prime" || g.shape === "sys" || g.shape === "block"){
+    const pw = headW*0.46, ph = headH*0.15;
+    const mg = ctx.createLinearGradient(0, mouthY-ph/2, 0, mouthY+ph/2);
+    mg.addColorStop(0, shade(g.trim, 12));
+    mg.addColorStop(1, shade(g.trim, -40));
+    ctx.fillStyle = mg;
+    rr(ctx, cx - pw/2, mouthY - ph/2, pw, ph, ph*0.30); ctx.fill();
+    ctx.strokeStyle = hexA(g.optics, .30); ctx.lineWidth = 1; ctx.stroke();
+    ctx.strokeStyle = "rgba(4,8,13,.9)"; ctx.lineWidth = Math.max(1, headW*0.012);
+    for(let i=1;i<4;i++){
+      const x = cx - pw/2 + (pw/4)*i;
+      ctx.beginPath(); ctx.moveTo(x, mouthY - ph*0.30); ctx.lineTo(x, mouthY + ph*0.30); ctx.stroke();
+    }
+  } else {
+    const open = speakAmt * headH*0.10;
+    const mw = headW*0.28, mh = headH*0.028 + open;
+    ctx.fillStyle = "#04080d";
+    rr(ctx, cx - mw/2, mouthY - mh/2, mw, Math.max(2.4, mh), mh*0.42); ctx.fill();
+    ctx.strokeStyle = hexA(g.trim, .5); ctx.lineWidth = 1.1; ctx.stroke();
+    if(open > 1.2){
+      ctx.fillStyle = hexA(g.optics, .55);
+      rr(ctx, cx - mw*0.30, mouthY + mh*0.05, mw*0.60, Math.max(1, open*0.30), 1); ctx.fill();
+    }
+  }
+  // teeth
+  if(g.teeth){
+    ctx.fillStyle = "#e9eef5";
+    for(let i=0;i<5;i++){
+      const x = cx - headW*0.16 + i*headW*0.08;
+      ctx.beginPath();
+      ctx.moveTo(x, mouthY + headH*0.055);
+      ctx.lineTo(x + headW*0.035, mouthY + headH*0.055);
+      ctx.lineTo(x + headW*0.017, mouthY + headH*0.105);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // chin plate
+  if(!mini && g.chin){
+    ctx.fillStyle = g.chin;
+    rr(ctx, cx - headW*0.13, cy + headH*0.335, headW*0.26, headH*0.055, headW*0.03);
+    ctx.fill();
+    ctx.strokeStyle = hexA(g.trim, .35); ctx.lineWidth = 1; ctx.stroke();
+  }
+
+  // Teletraan orbit ring
+  if(g.shape === "sys" && !mini){
+    ctx.strokeStyle = hexA(g.optics, .35); ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.ellipse(cx, cy, headW*0.78, headH*0.22, -0.30, 0, Math.PI*2); ctx.stroke();
+    ctx.fillStyle = hexA(g.optics, .9);
+    const a = t*0.0011;
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(a)*headW*0.72, cy + Math.sin(a)*headH*0.20, headW*0.026, 0, 7);
+    ctx.fill();
+  }
+
+  // ---------- holo overlay ----------
+  if(!mini){
+    ctx.globalCompositeOperation = "screen";
+    const sweep = ((t*0.055) % (H*1.4)) - H*0.2;
+    const sg = ctx.createLinearGradient(0, sweep-26, 0, sweep+26);
+    sg.addColorStop(0, hexA(g.optics, 0));
+    sg.addColorStop(.5, hexA(g.optics, .12));
+    sg.addColorStop(1, hexA(g.optics, 0));
+    ctx.fillStyle = sg;
+    ctx.fillRect(0, sweep-26, W, 52);
+    ctx.globalCompositeOperation = "source-over";
+
+    ctx.fillStyle = "rgba(3,8,14,.26)";
+    for(let y=0;y<H;y+=3) ctx.fillRect(0, y, W, 1);
+
+    if(Math.random() < .03){
+      ctx.fillStyle = "rgba(140,225,255,.05)";
+      ctx.fillRect(0, Math.random()*H, W, 1.5);
+    }
+  }
+}
+
+/* ============================================================
+   ROSTER RAIL
+   ============================================================ */
+function renderRail(){
+  const rail = $("#rail");
+  if(!rail.children.length){
+    BOTS.forEach(b=>{
+      const chip = document.createElement("button");
+      chip.className = "chip";
+      chip.dataset.id = b.id;
+      chip.type = "button";
+      chip.innerHTML = '<canvas width="76" height="76"></canvas><i>' + esc(b.short) + '</i>';
+      chip.addEventListener("click", () => {
+        ac();
+        selectBot(b.id);
+        chip.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" });
+      });
+      rail.appendChild(chip);
+      const cv = chip.querySelector("canvas");
+      const cx2 = cv.getContext("2d");
+      cx2.clearRect(0,0,76,76);
+      drawBot(cx2, 76, 76, b, 0, "mini");
+    });
+  }
+  [...rail.children].forEach(c => {
+    const on = c.dataset.id === state.active;
+    c.classList.toggle("sel", on);
+    c.classList.toggle("live", on && state.speaking);
+  });
+}
+
+/* ============================================================
+   METERS
+   ============================================================ */
+const meterEls = [];
+function buildMeters(){
+  const box = $("#meters");
+  for(let i=0;i<14;i++){
+    const el = document.createElement("i");
+    el.style.height = "12%";
+    box.appendChild(el);
+    meterEls.push(el);
+  }
+}
+let meterPhase = 0;
+function updateMeters(){
+  meterPhase += 0.22;
+  const mic = state.micLevel;
+  const speak = state.speaking ? (0.45 + 0.55*Math.abs(Math.sin(meterPhase*0.9))) : 0;
+  const level = Math.max(mic, speak*0.9);
+  const b = bot(state.active);
+  meterEls.forEach((el,i)=>{
+    const wave = Math.abs(Math.sin(meterPhase*0.5 + i*0.55));
+    const h = Math.max(10, Math.min(100, (level*95 + 6) * (0.55 + wave*0.7)));
+    el.style.height = h.toFixed(0) + "%";
+    el.style.background = "linear-gradient(180deg," + b.color + ",rgba(95,208,255,.12))";
+  });
+}
+
+/* ============================================================
+   ANIMATION LOOP
+   ============================================================ */
+let lastDraw = 0, lastStateTxt = "";
+let lastSpeak = false;
+function updateHoloState(){
+  const b = bot(state.active);
+  const txt = state.speaking ? "TRANSMITTING" : state.listening ? "LISTENING · CHANNEL OPEN" : "CHANNEL OPEN";
+  if(txt !== lastStateTxt){
+    lastStateTxt = txt;
+    $("#holoState").textContent = txt;
+    $("#holoState").style.color = state.speaking ? "#ffd36a" : b.color;
+  }
+  if(state.speaking !== lastSpeak){
+    lastSpeak = state.speaking;
+    document.querySelectorAll("#rail .chip").forEach(c=>{
+      c.classList.toggle("live", c.dataset.id === state.active && state.speaking);
+    });
+  }
+}
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(ts - lastDraw < 24) return;
+  lastDraw = ts;
+  state.micLevel = readMic();
+  const { w, h } = fitCanvas(holoC);
+  hctx.setTransform(DPR,0,0,DPR,0,0);
+  hctx.clearRect(0,0,w,h);
+  drawBot(hctx, w, h, bot(state.active), ts, "full");
+  updateMeters();
+  updateHoloState();
+}
+
+/* ============================================================
+   WIRING
+   ============================================================ */
+function boot(){
+  loadState();
+  renderRail();
+  buildMeters();
+  syncButtons();
+  renderLog();
+
+  const b = bot(state.active);
+  $("#holoName").textContent = b.name.toUpperCase();
+  $("#holoRank").textContent = b.rank;
+  $("#screen").style.setProperty("--bot", b.color);
+
+  // tap the holo portrait to make that unit speak up
+  $("#holo").addEventListener("click", () => {
+    ac();
+    if(state.speaking) return;
+    const b2 = bot(state.active);
+    const pool = b2.ambient || b2.fallback;
+    const line = pool[Math.floor(Math.random()*pool.length)];
+    transmit(b2.id, line);
+  });
+
+  $("#btnListen").addEventListener("click", () => { ac(); toggleListening(); });
+  $("#btnAuto").addEventListener("click", () => {
+    ac(); state.autoReply = !state.autoReply; syncButtons(); saveState();
+    toast(state.autoReply ? "AUTO-REPLY ON · ANSWERS EVERYTHING" : "ADDRESSED ONLY · SAY A NAME");
+    logLine("teletraan","sys", state.autoReply ? "Auto-reply enabled. Any speech on this net gets an answer." : "Addressed-only mode. Name an Autobot to get a reply.", false);
+    SFX.key();
+  });
+  $("#btnNet").addEventListener("click", () => {
+    ac(); state.netChat = !state.netChat; syncButtons(); saveState();
+    toast("NET CHATTER " + (state.netChat ? "ON" : "OFF"));
+    SFX.key();
+  });
+  $("#btnVoice").addEventListener("click", () => {
+    ac();
+    state.voiceOn = !state.voiceOn;
+    if(!state.voiceOn) stopSpeech();
+    syncButtons(); saveState();
+    toast(state.voiceOn ? "VOICE OUTPUT ON" : "VOICE MUTED");
+    if(state.voiceOn){ loadVoices(); SFX.ping(); }
+  });
+
+  $("#consoleForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const inp = $("#cmd");
+    const v = inp.value.trim();
+    if(!v) return;
+    inp.value = "";
+    ac();
+    handleUtterance(v, "type");
+  });
+
+  window.addEventListener("resize", () => { fitCanvas(holoC); });
+  window.addEventListener("orientationchange", () => setTimeout(()=>fitCanvas(holoC), 300));
+  document.addEventListener("visibilitychange", () => { if(document.hidden) stopSpeech(); });
+
+  const unlock = () => { ac(); loadVoices(); window.removeEventListener("pointerdown", unlock); };
+  window.addEventListener("pointerdown", unlock, { once:true });
+
+  setTimeout(() => {
+    const greet = state.log.length
+      ? "Net restored. " + b.name + " on channel."
+      : "Autobot Command Net online. Twelve units on the wire. Tap LISTEN and speak, or type a command.";
+    logLine("teletraan","sys", greet, true);
+    caption("teletraan", greet);
+  }, 500);
+
+  if(!recSupported()){
+    setTimeout(()=>{
+      logLine("teletraan","sys","Voice recognition unavailable in this browser. Typing works everywhere. Chrome, Edge and Safari can hear you.", false);
+    }, 1400);
+  }
+  scheduleChatter();
+  requestAnimationFrame(loop);
+  setInterval(saveState, 15000);
+
+  if(/^https?:/.test(location.protocol)){
+    const add = (rel, href) => { const l = document.createElement("link"); l.rel = rel; l.href = href; document.head.appendChild(l); };
+    add("manifest", "manifest.webmanifest");
+    add("apple-touch-icon", "icon-192.png");
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.register("sw.js").catch(()=>{});
+    }
+  }
+}
+if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
+else boot();
+
+</script>
+</body>
+</html>
